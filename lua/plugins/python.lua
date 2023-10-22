@@ -1,4 +1,51 @@
 local util = require("config.util")
+local pyutil = require("config.pyutil")
+
+vim.api.nvim_create_user_command("LspAddExtraPath", function(opts)
+  local path = opts.fargs[1]
+  for _, client in ipairs(vim.lsp.get_active_clients()) do
+    if client.name == "pyright" then
+      local extra_paths = util.lookup(client.config.settings, "python", "analysis", "extraPaths") or {}
+      table.insert(extra_paths, path)
+      client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+        python = {
+          analysis = {
+            extraPaths = extra_paths,
+          },
+        },
+      })
+      client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    elseif client.name == "pylsp" then
+      local extra_paths = util.lookup(client.config.settings, "pylsp", "plugins", "jedi", "extra_paths") or {}
+      table.insert(extra_paths, path)
+      client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+        pylsp = {
+          plugins = {
+            jedi = {
+              extra_paths = extra_paths,
+            },
+          },
+        },
+      })
+      client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    end
+  end
+end, {
+  nargs = 1,
+  complete = "dir",
+})
+
+require("lazyvim.util").lsp.on_attach(function(client, bufnr)
+  pyutil.set_client_venv_paths(client, bufnr)
+
+  -- add a mapping to toggle pyright diagnostic mode
+  if client.name == "pyright" then
+    vim.keymap.set("n", "<leader>cD", pyutil.toggle_pyright_diagnostic_mode, {
+      desc = "Toggle Pyright diagnostic mode",
+      buffer = true,
+    })
+  end
+end)
 
 return {
   { import = "lazyvim.plugins.extras.lang.python" },
@@ -25,7 +72,7 @@ return {
       opts.servers = opts.servers or {}
       opts.servers.ruff_lsp = {
         -- autostart = false,
-        root_dir = util.find_root_dir,
+        root_dir = pyutil.find_root_dir,
         init_options = {
           settings = {
             args = {
@@ -36,15 +83,15 @@ return {
       }
       opts.servers.pyright = {
         -- autostart = false,
-        root_dir = util.find_root_dir,
-        on_attach = util.set_client_venv_paths,
+        root_dir = pyutil.find_root_dir,
         settings = {
-          pyright = {
-            disableLanguageServices = true,
-          },
+          -- pyright = {
+          --   disableLanguageServices = true,
+          -- },
           python = {
             analysis = {
-              diagnosticMode = "workspace",
+              -- diagnosticMode = "workspace",
+              diagnosticMode = "openFilesOnly",
               typeCheckingMode = "basic",
             },
           },
@@ -57,9 +104,9 @@ return {
         -- * pylsp-rope,
         -- * python-lsp-black,
 
-        -- autostart = false,
-        root_dir = util.find_root_dir,
-        on_attach = util.set_client_venv_paths,
+        autostart = false,
+        -- cmd = { 'pylsp', '-vv' },
+        root_dir = pyutil.find_root_dir,
         settings = {
           pylsp = {
             plugins = {
@@ -80,7 +127,7 @@ return {
                 include_class_objects = true,
                 include_function_objects = true,
                 fuzzy = true,
-                eager = true,
+                -- eager = true,
               },
               jedi_hover = { enabled = false },
               -- mypy = {
@@ -141,4 +188,13 @@ return {
   --     { "<leader>cV", "<cmd>:VenvSelectCached<cr>", desc = "Select Cached VirtualEnv" },
   --   },
   -- },
+
+  {
+    "stevearc/conform.nvim",
+    opts = function(_, opts)
+      opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
+        python = { "isort", "black" },
+      })
+    end,
+  },
 }

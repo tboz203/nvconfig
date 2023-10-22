@@ -5,6 +5,6 @@
 vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
 -- vim.lsp.set_log_level(vim.log.levels.DEBUG)
 
-vim.o.autowrite = false
-vim.o.autowriteall = false
-vim.o.hidden = true
+-- vim.o.autowrite = false
+-- vim.o.autowriteall = false
+-- vim.o.hidden = true

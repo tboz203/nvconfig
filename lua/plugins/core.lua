@@ -1,13 +1,7 @@
+-- stylua: ignore
 -- if true then return {} end
 
 return {
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "tokyonight-night",
-    },
-  },
-
   -- change trouble config
   {
     "folke/trouble.nvim",
@@ -87,7 +81,7 @@ return {
     dependencies = {
       "jose-elias-alvarez/typescript.nvim",
       init = function()
-        require("lazyvim.util").on_attach(function(_, buffer)
+        require("lazyvim.util").lsp.on_attach(function(_, buffer)
           -- stylua: ignore
           vim.keymap.set("n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
           vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
@@ -102,6 +96,10 @@ return {
       servers = {
         -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
+        cucumber_language_server = {
+          autostart = false,
+          cmd = { 'env', 'NODENV_VERSION=16.19.0', 'cucumber-language-server', '--stdio' },
+        },
       },
       -- you can do any additional lsp server setup here
       -- return true if you don't want this server to be setup with lspconfig
@@ -182,14 +180,31 @@ return {
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
+      opts.registries = {
+        "lua:config.mason_registry",
+        "github:mason-org/mason-registry",
+      }
+      -- opts.providers = {
+      --   -- prefer local tooling
+      --   "mason.providers.client",
+      --   "mason.providers.registry-api",
+      -- }
+      opts.ui = {
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗"
+        }
+      }
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
+        -- need to figure out a way to reliably install my own tree-sitter-cli
+        -- package into cucumber's node_modules...
         "cucumber-language-server",
-        "debugpy",
         "stylua",
         "shellcheck",
         "shfmt",
-        "flake8",
+        "yq",
       })
     end,
   },
@@ -247,6 +262,13 @@ return {
   },
 
   { "echasnovski/mini.pairs", enabled = false },
+  { "tpope/vim-repeat" },
+  { "tpope/vim-sensible" },
+  { "towolf/vim-helm" },
+  { "sheerun/vim-polyglot" },
+
+  { "s1n7ax/nvim-window-picker" },
+
 
   -- {
   --   "nvim-telescope/telescope.nvim",
@@ -271,24 +293,11 @@ return {
   --   },
   -- },
 
-  -- give a group name to my <leader>r group
   {
     "folke/which-key.nvim",
+    -- enabled = false,
     event = "VeryLazy",
-    opts = {
-      defaults = {
-        ["<leader>r"] = { name = "+re-format" },
-      },
-    },
   },
-
-  -- { "nvim-tree/nvim-web-devicons", tag = "nerd-v2-compat" },
-  -- {
-  --   "preservim/tagbar",
-  --   keys = {
-  --     { "<leader>cs", "<cmd>TagbarToggle<cr>", desc = "Toggle Tagbar" },
-  --   },
-  -- },
 
   {
     "stevearc/aerial.nvim",
@@ -311,8 +320,6 @@ return {
     },
   },
 
-  { "tpope/vim-repeat" },
-  { "tpope/vim-sensible" },
 
   {
     "simnalamburt/vim-mundo",
@@ -330,15 +337,35 @@ return {
     },
   },
 
-  { "towolf/vim-helm" },
-  { "sheerun/vim-polyglot" },
-
-  { "s1n7ax/nvim-window-picker" },
-
   {
     "echasnovski/mini.animate",
     config = true,
     enabled = false,
+  },
+
+  { import = "lazyvim.plugins.extras.editor.leap" },
+
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+      close_if_last_window = true,
+    },
+  },
+
+  { import = "lazyvim.plugins.extras.lang.ruby" },
+  { import = "lazyvim.plugins.extras.lang.typescript" },
+
+  {
+    "akinsho/bufferline.nvim",
+    opts = {
+      options = {
+        always_show_bufferline = true,
+      },
+    },
+  },
+
+  {
+    "echasnovski/mini.nvim",
   },
 
 }
