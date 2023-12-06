@@ -40,14 +40,6 @@ vim.keymap.set("", "zT", "H", { desc = "Move cursor 'Top'" })
 vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
--- bufferline commands
-vim.keymap.set("n", "<leader>bb", function()
-  require("bufferline").pick()
-end, { desc = "Pick buffer" })
-vim.keymap.set("n", "<leader>bx", function()
-  require("bufferline").close_with_pick()
-end, { desc = "Pick buffer to close" })
-
 -- toggle diagnostics locally
 vim.keymap.set("n", "<leader>ud", function()
   if vim.diagnostic.is_disabled(0) then

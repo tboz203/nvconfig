@@ -1,24 +1,21 @@
--- stylua: ignore
 -- if true then return {} end
 
 return {
+
+  {
+    "LazyVim/LazyVim",
+    keys = {
+      -- clear the LspInfo keymap, using it as a prefix for lsp mappings in config.keymaps
+      -- (this still isn't working quite right 😢)
+      { "<leader>cl" },
+    },
+  },
   -- change trouble config
   {
     "folke/trouble.nvim",
     -- opts will be merged with the parent spec
     opts = { use_diagnostic_signs = true },
   },
-
-  -- disable trouble
-  -- { "folke/trouble.nvim", enabled = false },
-
-  -- add symbols-outline
-  -- {
-  --   "simrat39/symbols-outline.nvim",
-  --   cmd = "SymbolsOutline",
-  --   keys = { { "<leader>cs", "<cmd>SymbolsOutline<cr>", desc = "Symbols Outline" } },
-  --   config = true,
-  -- },
 
   -- override nvim-cmp and add cmp-emoji
   {
@@ -35,33 +32,61 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
-      "nvim-telescope/telescope-fzf-native.nvim",
-      build = "make",
-      config = function()
-        require("telescope").load_extension("fzf")
-      end,
+      "nvim-lua/plenary.nvim",
     },
     keys = {
       -- add a keymap to browse plugin files
-      -- stylua: ignore
       {
         "<leader>fp",
-        function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
+        -- function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
+        require("lazyvim.util").telescope("find_files", { cwd = require("lazy.core.config").options.root }),
         desc = "Find Plugin File",
       },
       {
-        "<leader>fP",
-        function()
-          require("telescope.builtin").live_grep({ cwd = require("lazy.core.config").options.root })
-        end,
+        "<leader>sp",
+        -- function() require("telescope.builtin").live_grep({ cwd = require("lazy.core.config").options.root }) end,
+        require("lazyvim.util").telescope("live_grep", { cwd = require("lazy.core.config").options.root }),
         desc = "Grep Plugin Files",
       },
       {
         "gf",
-        function()
-          require("telescope.builtin").find_files({ search_file = vim.fn.expand("<cfile>") })
-        end,
+        -- function() require("telescope.builtin").find_files({ search_file = vim.fn.expand("<cfile>") }) end,
+        require("lazyvim.util").telescope("find_files", { search_file = vim.fn.expand("<cfile>") }),
         desc = "Telescope to file",
+      },
+      {
+        "<leader>fu",
+        require("lazyvim.util").telescope("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }),
+        desc = "Find files unrestricted (root dir)",
+      },
+      {
+        "<leader>fU",
+        require("lazyvim.util").telescope(
+          "find_files",
+          { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = false }
+        ),
+        desc = "Find files unrestricted (cwd)",
+      },
+      {
+        "<leader>su",
+        require("lazyvim.util").telescope("live_grep", {
+          vimgrep_arguments = vim.list_extend(
+            vim.list_slice(require("telescope.config").values.vimgrep_arguments),
+            { "-uu" }
+          ),
+        }),
+        desc = "Grep unrestricted (root dir)",
+      },
+      {
+        "<leader>sU",
+        require("lazyvim.util").telescope("live_grep", {
+          vimgrep_arguments = vim.list_extend(
+            vim.list_slice(require("telescope.config").values.vimgrep_arguments),
+            { "-uu" }
+          ),
+          cwd = false,
+        }),
+        desc = "Find files unrestricted (cwd)",
       },
     },
     -- change some options
@@ -71,8 +96,34 @@ return {
         layout_config = { prompt_position = "top" },
         sorting_strategy = "ascending",
         winblend = 0,
+        -- mappings = {
+        --   i = {
+        --     -- was looking for "allow editing ripgrep command";
+        --     -- got "put current highlighted line into vim cmd window"
+        --     ["<C-f>"] = "edit_command_line",
+        --   },
+        --   n = {
+        --     ["<C-f>"] = "edit_command_line",
+        --   },
+        -- },
       },
     },
+  },
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build = "make",
+    config = function()
+      require("telescope").load_extension("fzf")
+    end,
+  },
+  {
+    "debugloop/telescope-undo.nvim",
+    keys = {
+      { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
+    },
+    config = function()
+      require("telescope").load_extension("undo")
+    end,
   },
 
   -- add tsserver and setup with typescript.nvim instead of lspconfig
@@ -82,7 +133,6 @@ return {
       "jose-elias-alvarez/typescript.nvim",
       init = function()
         require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
           vim.keymap.set("n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
           vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
         end)
@@ -98,7 +148,7 @@ return {
         tsserver = {},
         cucumber_language_server = {
           autostart = false,
-          cmd = { 'env', 'NODENV_VERSION=16.19.0', 'cucumber-language-server', '--stdio' },
+          cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
         },
       },
       -- you can do any additional lsp server setup here
@@ -119,6 +169,8 @@ return {
   -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
   -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
   { import = "lazyvim.plugins.extras.lang.typescript" },
+
+  { import = "lazyvim.plugins.extras.lang.clangd" },
 
   -- ensure particular parsers are included by default
   {
@@ -150,26 +202,6 @@ return {
     end,
   },
 
-  -- -- the opts function can also be used to change the default opts:
-  -- {
-  --   "nvim-lualine/lualine.nvim",
-  --   event = "VeryLazy",
-  --   opts = function(_, opts)
-  --     table.insert(opts.sections.lualine_x, "😄")
-  --   end,
-  -- },
-
-  -- -- or you can return new options to override all the defaults
-  -- {
-  --   "nvim-lualine/lualine.nvim",
-  --   event = "VeryLazy",
-  --   opts = function()
-  --     return {
-  --       --[[add your custom lualine config here]]
-  --     }
-  --   end,
-  -- },
-
   -- use mini.starter instead of alpha
   { import = "lazyvim.plugins.extras.ui.mini-starter" },
 
@@ -193,8 +225,8 @@ return {
         icons = {
           package_installed = "✓",
           package_pending = "➜",
-          package_uninstalled = "✗"
-        }
+          package_uninstalled = "✗",
+        },
       }
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
@@ -262,36 +294,14 @@ return {
   },
 
   { "echasnovski/mini.pairs", enabled = false },
+  { "tpope/vim-fugitive" },
   { "tpope/vim-repeat" },
   { "tpope/vim-sensible" },
+  { "tpope/vim-unimpaired" },
   { "towolf/vim-helm" },
   { "sheerun/vim-polyglot" },
 
   { "s1n7ax/nvim-window-picker" },
-
-
-  -- {
-  --   "nvim-telescope/telescope.nvim",
-  --   dependencies = { "debugloop/telescope-undo.nvim" },
-  -- },
-  -- {
-  --   "debugloop/telescope-undo.nvim",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --   },
-  --   config = function()
-  --     local telescope = require('telescope')
-  --     telescope.setup({
-  --       extensions = {
-  --         undo = {},
-  --       },
-  --     })
-  --     telescope.load_extension("undo")
-  --   end,
-  --   keys = {
-  --     { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" }
-  --   },
-  -- },
 
   {
     "folke/which-key.nvim",
@@ -320,22 +330,22 @@ return {
     },
   },
 
-
-  {
-    "simnalamburt/vim-mundo",
-    config = function()
-      vim.g.mundo_right = 1
-    end,
-    keys = {
-      {
-        "<leader>uu",
-        function()
-          vim.cmd.MundoToggle()
-        end,
-        desc = "Toggle Undotree",
-      },
-    },
-  },
+  -- {
+  --   "simnalamburt/vim-mundo",
+  --   lazy = false,
+  --   config = function()
+  --     vim.g.mundo_right = 1
+  --   end,
+  --   keys = {
+  --     {
+  --       "<leader>uu",
+  --       function()
+  --         vim.cmd.MundoToggle()
+  --       end,
+  --       desc = "Toggle Undotree",
+  --     },
+  --   },
+  -- },
 
   {
     "echasnovski/mini.animate",
@@ -362,10 +372,23 @@ return {
         always_show_bufferline = true,
       },
     },
+    keys = {
+      { "<leader>bb", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
+      { "<leader>bx", "<cmd>BufferLinePickClose<cr>", desc = "Close buffer with pick" },
+      { "<leader>bh", "<cmd>BufferLineMovePrev<cr>", desc = "Move Buffer Left" },
+      { "<leader>bl", "<cmd>BufferLineMoveNext<cr>", desc = "Move Buffer Right" },
+      -- LazyVim defined `bl` and `br` to delete buffers left and right
+      -- respectively; we're overriding one of those, and clearing the other
+      { "<leader>br" },
+    },
   },
 
   {
     "echasnovski/mini.nvim",
   },
 
+  {
+    "echasnovski/mini.align",
+    config = true,
+  },
 }
