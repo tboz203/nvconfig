@@ -391,4 +391,61 @@ return {
     "echasnovski/mini.align",
     config = true,
   },
+
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    opts = function(_, opts)
+      -- table.insert(opts.sections.lualine_x, "😄")
+      table.remove(opts.sections.lualine_c)
+      -- copied from lazyvim.util.lualine.pretty_path, with minor modifications
+      table.insert(opts.sections.lualine_c, function()
+        local Util = require("lazyvim.util")
+        local path = vim.fn.expand("%:p") --[[@as string]]
+
+        if path == "" then
+          return ""
+        end
+        local root = Util.root.get({ normalize = true })
+        local cwd = Util.root.cwd()
+
+        if path:find(cwd, 1, true) == 1 then
+          path = path:sub(#cwd + 2)
+        else
+          path = path:sub(#root + 2)
+        end
+
+        local sep = package.config:sub(1, 1)
+        local parts = vim.split(path, "[\\/]")
+        -- if #parts > 3 then
+        --   parts = { parts[1], "…", parts[#parts - 1], parts[#parts] }
+        -- end
+
+        if vim.bo.modified then
+          parts[#parts] = M.format(self, parts[#parts], "Constant")
+        end
+
+        return table.concat(parts, sep)
+      end)
+    end,
+  },
+
+  {
+    "stevearc/conform.nvim",
+    -- opts = function(_, opts)
+    --   opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
+    --     python = { "isort", "black" },
+    --   })
+    -- end,
+    opts = {
+      formatters_by_ft = {
+        sql = { "sleek" },
+      },
+      formatters = {
+        sleek = {
+          command = "sleek",
+        },
+      },
+    },
+  },
 }
