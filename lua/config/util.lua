@@ -56,4 +56,64 @@ function M.pi(...)
 end
 -- may consider making this a global...
 
+-- toggling diagnostics (for LSP, etc)
+M.diagnostic_state = { [-1] = true }
+
+function M.toggle_current_buffer_diagnostics()
+  -- find our current state
+  local buf_id = vim.api.nvim_get_current_buf()
+  local buf_state = M.diagnostic_state[buf_id]
+  local global_state = M.diagnostic_state[-1]
+
+  -- if we match global state (explicit or otherwise) then
+  if buf_state == nil or buf_state == global_state then
+    -- set to !global_state
+    if global_state then
+      M.diagnostic_state[buf_id] = false
+      vim.notify("Disabling diagnostics in buffer")
+      vim.diagnostic.disable(buf_id)
+    else
+      M.diagnostic_state[buf_id] = true
+      vim.notify("Enabling diagnostics in buffer")
+      vim.diagnostic.enable(buf_id)
+    end
+  else
+    -- otherwise clear buffer state & match global
+    M.diagnostic_state[buf_id] = nil
+    if global_state then
+      vim.notify("Clearing diagnostics toggle (enabled globally)")
+      vim.diagnostic.enable(buf_id)
+    else
+      vim.notify("Clearing diagnostics toggle (disabled globally)")
+      vim.diagnostic.disable(buf_id)
+    end
+  end
+end
+
+function M.toggle_global_diagnostics()
+  -- fetch, toggle, and store global state
+  local global_state = not M.diagnostic_state[-1]
+  M.diagnostic_state[-1] = global_state
+
+  -- give notice
+  if global_state then
+    vim.notify("Enabling diagnostics globally")
+  else
+    vim.notify("Disabling diagnostics globally")
+  end
+
+  -- for each buffer
+  for _, buf_id in ipairs(vim.api.nvim_list_bufs()) do
+    -- if it does not have an explicit diagnostic state:
+    if M.diagnostic_state[buf_id] == nil then
+      -- set appropriate diagnostic state
+      if global_state then
+        vim.diagnostic.enable(buf_id)
+      else
+        vim.diagnostic.disable(buf_id)
+      end
+    end
+  end
+end
+
 return M

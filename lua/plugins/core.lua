@@ -116,15 +116,15 @@ return {
       require("telescope").load_extension("fzf")
     end,
   },
-  {
-    "debugloop/telescope-undo.nvim",
-    keys = {
-      { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
-    },
-    config = function()
-      require("telescope").load_extension("undo")
-    end,
-  },
+  -- {
+  --   "debugloop/telescope-undo.nvim",
+  --   keys = {
+  --     { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
+  --   },
+  --   config = function()
+  --     require("telescope").load_extension("undo")
+  --   end,
+  -- },
 
   -- add tsserver and setup with typescript.nvim instead of lspconfig
   {
@@ -320,32 +320,37 @@ return {
         "<leader>cs",
         function()
           require("aerial").toggle()
+          -- vim.cmd.wincmd("=")
         end,
         desc = "Toggle Aerial",
       },
     },
     opts = {
-      backends = { "treesitter", "lsp" },
+      layout = {
+        default_direction = "prefer_left",
+        preserve_equality = true,
+      },
+      -- backends = { "treesitter", "lsp" },
       -- filter_kind = false,
     },
   },
 
-  -- {
-  --   "simnalamburt/vim-mundo",
-  --   lazy = false,
-  --   config = function()
-  --     vim.g.mundo_right = 1
-  --   end,
-  --   keys = {
-  --     {
-  --       "<leader>uu",
-  --       function()
-  --         vim.cmd.MundoToggle()
-  --       end,
-  --       desc = "Toggle Undotree",
-  --     },
-  --   },
-  -- },
+  {
+    "simnalamburt/vim-mundo",
+    lazy = false,
+    config = function()
+      vim.g.mundo_right = 1
+    end,
+    keys = {
+      {
+        "<leader>uu",
+        function()
+          vim.cmd.MundoToggle()
+        end,
+        desc = "Toggle Undotree",
+      },
+    },
+  },
 
   {
     "echasnovski/mini.animate",
@@ -421,9 +426,9 @@ return {
         --   parts = { parts[1], "…", parts[#parts - 1], parts[#parts] }
         -- end
 
-        if vim.bo.modified then
-          parts[#parts] = M.format(self, parts[#parts], "Constant")
-        end
+        -- if vim.bo.modified then
+        --   parts[#parts] = M.format(self, parts[#parts], "Constant")
+        -- end
 
         return table.concat(parts, sep)
       end)
@@ -439,11 +444,15 @@ return {
     -- end,
     opts = {
       formatters_by_ft = {
-        sql = { "sleek" },
+        -- sql = { "sleek" },
+        sql = { "sql_formatter", "sqlfluff", "pg_format" },
       },
       formatters = {
         sleek = {
           command = "sleek",
+        },
+        sql_formatter = {
+          prepend_args = { "-l", "postgresql" },
         },
       },
     },

@@ -2,6 +2,8 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
+local util = require("config.util")
+
 -- local wk = require("which-key") or { register = function() end }
 local wk = (function()
   local status, wk = pcall(require, "which-key")
@@ -40,28 +42,9 @@ vim.keymap.set("", "zT", "H", { desc = "Move cursor 'Top'" })
 vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
--- toggle diagnostics locally
-vim.keymap.set("n", "<leader>ud", function()
-  if vim.diagnostic.is_disabled(0) then
-    vim.cmd.echo('"Enabling diagnostics in buffer"')
-    vim.diagnostic.enable(0)
-  else
-    vim.cmd.echo('"Disabling diagnostics in buffer"')
-    vim.diagnostic.disable(0)
-  end
-end, { desc = "Toggle Diagnostics in Buffer" })
-
--- toggle diagnostics globally
-vim.keymap.set("n", "<leader>uD", function()
-  -- we'll toggle the current buffer and set all other buffers to match
-  if vim.diagnostic.is_disabled(0) then
-    vim.cmd.echo('"Enabling diagnostics globally"')
-    vim.diagnostic.enable()
-  else
-    vim.cmd.echo('"Disabling diagnostics globally"')
-    vim.diagnostic.disable()
-  end
-end, { desc = "Toggle Diagnostics Globally" })
+-- toggle diagnostics (for LSP, etc)
+vim.keymap.set("n", "<leader>ud", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
+vim.keymap.set("n", "<leader>uD", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
 
 -- LSP debugging
 wk.register({ ["<leader>cl"] = { name = "LSP" } })

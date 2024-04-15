@@ -26,7 +26,7 @@ end
 
 -- given a filename in a python project, determine its project root directory
 function M.find_root_dir(fname)
-  local lsputil = require("lspconfig.util")
+  -- first check for `site-packages` in path ancestors
   local root = Path.path.root(fname)
   local ancestor = Path.new(fname)
   while true do
@@ -39,19 +39,19 @@ function M.find_root_dir(fname)
     end
     ancestor = ancestor:parent()
   end
+
+  -- otherwise look for certain files in each ancestor directory
   -- based on function from pylsp lspconfig; removed `setup.py` to prevent false positives
-  local root_files = {
+  local filepath = Path.new(fname)
+  filepath = filepath:find_any_upwards(
     "requirements.txt",
     "requirements.in",
     "setup.cfg",
+    ".git",
     "pyproject.toml",
-    "Pipfile",
-  }
-  return (
-    lsputil.root_pattern(unpack(root_files))(fname)
-    or lsputil.find_git_ancestor(fname)
-    or lsputil.find_mercurial_ancestor(fname)
-  )
+    "Pipfile"
+  ) or filepath
+  return tostring(filepath:parent())
 end
 
 -- table of functions to set python paths per lsp client

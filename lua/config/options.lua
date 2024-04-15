@@ -10,6 +10,8 @@ vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
 -- vim.o.autowriteall = false
 -- vim.o.hidden = true
 
+vim.o.linebreak = true
+
 -- vim.o.wrapscan = false
 vim.o.relativenumber = false
 
