@@ -34,3 +34,5 @@ str
 mypy
 jsonpath
 Django
+reauthentication
+reauthenticate
