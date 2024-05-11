@@ -36,3 +36,5 @@ jsonpath
 Django
 reauthentication
 reauthenticate
+subclassing
+variadic
