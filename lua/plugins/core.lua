@@ -164,6 +164,10 @@ return {
         -- ["*"] = function(server, opts) end,
       },
     },
+    init = function()
+      local keys = require("lazyvim.plugins.lsp.keymaps").get()
+      keys[#keys + 1] = { "<leader>cl", false }
+    end,
   },
 
   -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
@@ -293,7 +297,6 @@ return {
     end,
   },
 
-  { "echasnovski/mini.pairs", enabled = false },
   { "tpope/vim-fugitive" },
   { "tpope/vim-repeat" },
   { "tpope/vim-sensible" },
@@ -341,24 +344,27 @@ return {
     config = function()
       vim.g.mundo_right = 1
     end,
+    --stylua: ignore
     keys = {
-      {
-        "<leader>uu",
-        function()
-          vim.cmd.MundoToggle()
-        end,
-        desc = "Toggle Undotree",
-      },
+      { "<leader>uu", function() vim.cmd.MundoToggle() end, desc = "Toggle Undotree", },
     },
   },
 
-  {
-    "echasnovski/mini.animate",
-    config = true,
-    enabled = false,
-  },
+  -- { import = "lazyvim.plugins.extras.editor.leap" },
 
-  { import = "lazyvim.plugins.extras.editor.leap" },
+  {
+    "folke/flash.nvim",
+    --stylua: ignore
+    keys = {
+      { "s", false},
+      { "S", false},
+      { "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "gS", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+      -- { "gR", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    },
+  },
 
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -369,6 +375,8 @@ return {
 
   { import = "lazyvim.plugins.extras.lang.ruby" },
   { import = "lazyvim.plugins.extras.lang.typescript" },
+
+  -- { "<leader>cl", false },
 
   {
     "akinsho/bufferline.nvim",
@@ -388,14 +396,17 @@ return {
     },
   },
 
+  -- { "echasnovski/mini.nvim" },
+  { "echasnovski/mini.ai" },
+  { "echasnovski/mini.align" },
+  { "echasnovski/mini.pairs", enabled = false },
   {
-    "echasnovski/mini.nvim",
-  },
-
-  {
-    "echasnovski/mini.align",
+    "echasnovski/mini.surround",
     config = true,
+    lazy = false,
+    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
   },
+  -- { "echasnovski/mini.animate", enabled = false },
 
   {
     "nvim-lualine/lualine.nvim",
