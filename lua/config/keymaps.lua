@@ -16,6 +16,9 @@ end)()
 -- the basics
 -- vim.keymap.set({ "!", "v", "o" }, "jk", "<esc>", { remap = true })
 vim.keymap.set({ "!", "o" }, "jk", "<esc>", { remap = true })
+vim.keymap.set({ "!", "o" }, "Jk", "<esc>", { remap = true })
+vim.keymap.set({ "!", "o" }, "jK", "<esc>", { remap = true })
+vim.keymap.set({ "!", "o" }, "JK", "<esc>", { remap = true })
 vim.keymap.set("n", ";", ":")
 vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list characters" })
 
