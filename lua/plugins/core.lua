@@ -317,6 +317,13 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
+      {
+        "folke/trouble.nvim",
+        optional = true,
+        keys = {
+          { "<leader>cs", false },
+        },
+      },
     },
     keys = {
       {
