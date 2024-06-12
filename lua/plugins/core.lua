@@ -2,14 +2,6 @@
 
 return {
 
-  {
-    "LazyVim/LazyVim",
-    keys = {
-      -- clear the LspInfo keymap, using it as a prefix for lsp mappings in config.keymaps
-      -- (this still isn't working quite right 😢)
-      { "<leader>cl" },
-    },
-  },
   -- change trouble config
   {
     "folke/trouble.nvim",
@@ -23,8 +15,7 @@ return {
     dependencies = { "hrsh7th/cmp-emoji" },
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
-      local cmp = require("cmp")
-      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, { { name = "emoji" } }))
+      table.insert(opts.sources, { name = "emoji" })
     end,
   },
 
@@ -39,29 +30,29 @@ return {
       {
         "<leader>fp",
         -- function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").telescope("find_files", { cwd = require("lazy.core.config").options.root }),
+        require("lazyvim.util").pick("find_files", { cwd = require("lazy.core.config").options.root }),
         desc = "Find Plugin File",
       },
       {
         "<leader>sp",
         -- function() require("telescope.builtin").live_grep({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").telescope("live_grep", { cwd = require("lazy.core.config").options.root }),
+        require("lazyvim.util").pick("live_grep", { cwd = require("lazy.core.config").options.root }),
         desc = "Grep Plugin Files",
       },
       {
         "gf",
         -- function() require("telescope.builtin").find_files({ search_file = vim.fn.expand("<cfile>") }) end,
-        require("lazyvim.util").telescope("find_files", { search_file = vim.fn.expand("<cfile>") }),
+        require("lazyvim.util").pick("find_files", { search_file = vim.fn.expand("<cfile>") }),
         desc = "Telescope to file",
       },
       {
         "<leader>fu",
-        require("lazyvim.util").telescope("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }),
+        require("lazyvim.util").pick("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }),
         desc = "Find files unrestricted (root dir)",
       },
       {
         "<leader>fU",
-        require("lazyvim.util").telescope(
+        require("lazyvim.util").pick(
           "find_files",
           { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = false }
         ),
@@ -69,7 +60,7 @@ return {
       },
       {
         "<leader>su",
-        require("lazyvim.util").telescope("live_grep", {
+        require("lazyvim.util").pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -79,7 +70,7 @@ return {
       },
       {
         "<leader>sU",
-        require("lazyvim.util").telescope("live_grep", {
+        require("lazyvim.util").pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -133,13 +124,15 @@ return {
       "jose-elias-alvarez/typescript.nvim",
       init = function()
         require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          vim.keymap.set("n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
+          -- stylua: ignore
+          vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
           vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
         end)
       end,
     },
     ---@class PluginLspOpts
     opts = {
+      ---@type lspconfig.options
       -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
@@ -246,14 +239,6 @@ return {
   },
 
   -- Use <tab> for completion and snippets (supertab)
-  -- first: disable default <tab> and <s-tab> behavior in LuaSnip
-  {
-    "L3MON4D3/LuaSnip",
-    keys = function()
-      return {}
-    end,
-  },
-  -- then: setup supertab in cmp
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -267,17 +252,16 @@ return {
         return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
       end
 
-      local luasnip = require("luasnip")
       local cmp = require("cmp")
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
-            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            -- this way you will only jump inside the snippet region
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
+          elseif vim.snippet.active({ direction = 1 }) then
+            vim.schedule(function()
+              vim.snippet.jump(1)
+            end)
           elseif has_words_before() then
             cmp.complete()
           else
@@ -287,8 +271,10 @@ return {
         ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
+          elseif vim.snippet.active({ direction = -1 }) then
+            vim.schedule(function()
+              vim.snippet.jump(-1)
+            end)
           else
             fallback()
           end
