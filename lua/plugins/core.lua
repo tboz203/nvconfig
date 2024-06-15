@@ -1,3 +1,4 @@
+-- stylua: ignore
 -- if true then return {} end
 
 return {
@@ -292,14 +293,30 @@ return {
 
   { "s1n7ax/nvim-window-picker" },
 
+  { import = "lazyvim.plugins.extras.lang.ruby" },
+  { import = "lazyvim.plugins.extras.lang.typescript" },
+
+  -- { "echasnovski/mini.nvim" },
+  { "echasnovski/mini.ai" },
+  { "echasnovski/mini.align" },
+  { "echasnovski/mini.pairs", enabled = false },
   {
-    "folke/which-key.nvim",
-    -- enabled = false,
-    event = "VeryLazy",
+    "echasnovski/mini.surround",
+    config = true,
+    lazy = false,
+    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
   },
+  -- { "echasnovski/mini.animate", enabled = false },
+
+  -- {
+  --   "folke/which-key.nvim",
+  --   enabled = false,
+  --   event = "VeryLazy",
+  -- },
 
   {
     "stevearc/aerial.nvim",
+    enabled = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
@@ -359,15 +376,12 @@ return {
     },
   },
 
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    opts = {
-      close_if_last_window = true,
-    },
-  },
-
-  { import = "lazyvim.plugins.extras.lang.ruby" },
-  { import = "lazyvim.plugins.extras.lang.typescript" },
+  -- {
+  --   "nvim-neo-tree/neo-tree.nvim",
+  --   opts = {
+  --     close_if_last_window = true,
+  --   },
+  -- },
 
   -- { "<leader>cl", false },
 
@@ -388,18 +402,6 @@ return {
       { "<leader>br" },
     },
   },
-
-  -- { "echasnovski/mini.nvim" },
-  { "echasnovski/mini.ai" },
-  { "echasnovski/mini.align" },
-  { "echasnovski/mini.pairs", enabled = false },
-  {
-    "echasnovski/mini.surround",
-    config = true,
-    lazy = false,
-    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
-  },
-  -- { "echasnovski/mini.animate", enabled = false },
 
   {
     "nvim-lualine/lualine.nvim",
