@@ -230,6 +230,7 @@ return {
       vim.list_extend(opts.ensure_installed, {
         -- need to figure out a way to reliably install my own tree-sitter-cli
         -- package into cucumber's node_modules...
+        "bash-language-server",
         "cucumber-language-server",
         "stylua",
         "shellcheck",
