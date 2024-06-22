@@ -71,21 +71,21 @@ function M.toggle_current_buffer_diagnostics()
     if global_state then
       M.diagnostic_state[buf_id] = false
       vim.notify("Disabling diagnostics in buffer")
-      vim.diagnostic.disable(buf_id)
+      vim.diagnostic.enable(false, { bufnr = buf_id })
     else
       M.diagnostic_state[buf_id] = true
       vim.notify("Enabling diagnostics in buffer")
-      vim.diagnostic.enable(buf_id)
+      vim.diagnostic.enable(true, { bufnr = buf_id })
     end
   else
     -- otherwise clear buffer state & match global
     M.diagnostic_state[buf_id] = nil
     if global_state then
       vim.notify("Clearing diagnostics toggle (enabled globally)")
-      vim.diagnostic.enable(buf_id)
+      vim.diagnostic.enable(true, { bufnr = buf_id })
     else
       vim.notify("Clearing diagnostics toggle (disabled globally)")
-      vim.diagnostic.disable(buf_id)
+      vim.diagnostic.enable(false, { bufnr = buf_id })
     end
   end
 end
@@ -108,9 +108,9 @@ function M.toggle_global_diagnostics()
     if M.diagnostic_state[buf_id] == nil then
       -- set appropriate diagnostic state
       if global_state then
-        vim.diagnostic.enable(buf_id)
+        vim.diagnostic.enable(true, { bufnr = buf_id })
       else
-        vim.diagnostic.disable(buf_id)
+        vim.diagnostic.enable(false, { bufnr = buf_id })
       end
     end
   end

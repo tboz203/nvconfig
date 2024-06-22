@@ -4,7 +4,7 @@ local Path = util.Path
 
 -- toggle pyright lsp between analysing workspace & only open files
 function M.toggle_pyright_diagnostic_mode()
-  for _, client in pairs(vim.lsp.get_active_clients({ name = "pyright" })) do
+  for _, client in pairs(vim.lsp.get_clients({ name = "pyright" })) do
     local current_mode = util.lookup(client.config.settings, "python", "analysis", "diagnosticMode")
     local new_mode
     if current_mode == nil or current_mode == "workspace" then
@@ -101,7 +101,7 @@ M.python_paths_hooks = {
 
 -- set python interpreter and/or site-packages paths for all active python LSPs
 function M.set_python_paths(python_path)
-  for _, client in ipairs(vim.lsp.get_active_clients()) do
+  for _, client in ipairs(vim.lsp.get_clients()) do
     local set_paths_hook = M.python_paths_hooks[client.name]
     if set_paths_hook then
       set_paths_hook(python_path)

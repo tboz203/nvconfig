@@ -14,7 +14,6 @@ return {
   {
     "hrsh7th/nvim-cmp",
     dependencies = { "hrsh7th/cmp-emoji" },
-    ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
       table.insert(opts.sources, { name = "emoji" })
     end,
@@ -131,9 +130,7 @@ return {
         end)
       end,
     },
-    ---@class PluginLspOpts
     opts = {
-      ---@type lspconfig.options
       -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
@@ -147,7 +144,6 @@ return {
       },
       -- you can do any additional lsp server setup here
       -- return true if you don't want this server to be setup with lspconfig
-      ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
       setup = {
         -- example to setup with typescript.nvim
         tsserver = function(_, opts)
@@ -246,7 +242,6 @@ return {
     dependencies = {
       "hrsh7th/cmp-emoji",
     },
-    ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
       local has_words_before = function()
         unpack = unpack or table.unpack
@@ -294,7 +289,6 @@ return {
 
   { "s1n7ax/nvim-window-picker" },
 
-  { import = "lazyvim.plugins.extras.lang.ruby" },
   { import = "lazyvim.plugins.extras.lang.typescript" },
 
   -- { "echasnovski/mini.nvim" },
@@ -317,17 +311,17 @@ return {
 
   {
     "stevearc/aerial.nvim",
-    enabled = false,
+    -- enabled = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
-      {
-        "folke/trouble.nvim",
-        optional = true,
-        keys = {
-          { "<leader>cs", false },
-        },
-      },
+      -- {
+      --   "folke/trouble.nvim",
+      --   optional = true,
+      --   keys = {
+      --     { "<leader>cs", false },
+      --   },
+      -- },
     },
     keys = {
       {
