@@ -1,5 +1,6 @@
--- stylua: ignore
--- if true then return {} end
+-- if true then
+--   return {}
+-- end
 
 return {
 
@@ -54,7 +55,7 @@ return {
         "<leader>fU",
         require("lazyvim.util").pick(
           "find_files",
-          { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = false }
+          { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }
         ),
         desc = "Find files unrestricted (cwd)",
       },
@@ -75,7 +76,7 @@ return {
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
           ),
-          cwd = false,
+          cwd = nil,
         }),
         desc = "Find files unrestricted (cwd)",
       },
@@ -280,12 +281,12 @@ return {
     end,
   },
 
-  { "tpope/vim-fugitive" },
-  { "tpope/vim-repeat" },
-  { "tpope/vim-sensible" },
-  { "tpope/vim-unimpaired" },
-  { "towolf/vim-helm" },
-  { "sheerun/vim-polyglot" },
+  { "tpope/vim-fugitive", lazy = false },
+  { "tpope/vim-repeat", lazy = false },
+  { "tpope/vim-sensible", lazy = false },
+  { "tpope/vim-unimpaired", lazy = false },
+  { "towolf/vim-helm", lazy = false },
+  { "sheerun/vim-polyglot", lazy = false },
 
   { "s1n7ax/nvim-window-picker" },
 
@@ -294,24 +295,24 @@ return {
   -- { "echasnovski/mini.nvim" },
   { "echasnovski/mini.ai" },
   { "echasnovski/mini.align" },
-  { "echasnovski/mini.pairs", enabled = false },
+  { "echasnovski/mini.pairs", cond = false },
   {
     "echasnovski/mini.surround",
     config = true,
     lazy = false,
     -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
   },
-  -- { "echasnovski/mini.animate", enabled = false },
+  -- { "echasnovski/mini.animate", cond = false },
 
   -- {
   --   "folke/which-key.nvim",
-  --   enabled = false,
+  --   cond = false,
   --   event = "VeryLazy",
   -- },
 
   {
     "stevearc/aerial.nvim",
-    -- enabled = false,
+    -- cond = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",

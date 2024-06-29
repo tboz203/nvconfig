@@ -6,7 +6,8 @@ return {
     opts = {
       servers = {
         solargraph = {
-          cmd = { "bundle", "exec", "solargraph", "stdio" },
+          -- cmd = { "bundle", "exec", "solargraph", "stdio" },
+          cmd = { "rbenv", "exec", "solargraph", "stdio" },
         },
       },
     },
