@@ -287,6 +287,7 @@ return {
   { "tpope/vim-unimpaired", lazy = false },
   { "towolf/vim-helm", lazy = false },
   { "sheerun/vim-polyglot", lazy = false },
+  { "godlygeek/tabular", lazy = false, version = "*" },
 
   { "s1n7ax/nvim-window-picker" },
 

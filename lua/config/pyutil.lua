@@ -5,21 +5,22 @@ local Path = util.Path
 -- toggle pyright lsp between analysing workspace & only open files
 function M.toggle_pyright_diagnostic_mode()
   for _, client in pairs(vim.lsp.get_clients({ name = "pyright" })) do
-    local current_mode = util.lookup(client.config.settings, "python", "analysis", "diagnosticMode")
+    local settings = client.settings or client.config.settings
+    local current_mode = util.lookup(settings, "python", "analysis", "diagnosticMode")
     local new_mode
     if current_mode == nil or current_mode == "workspace" then
       new_mode = "openFilesOnly"
     else
       new_mode = "workspace"
     end
-    client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+    client.settings = vim.tbl_deep_extend("force", settings, {
       python = {
         analysis = {
           diagnosticMode = new_mode,
         },
       },
     })
-    client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    client.notify("workspace/didChangeConfiguration", { settings = nil })
     vim.notify(string.format("Set Pyright diagnostic mode to `%s`", new_mode), vim.log.levels.INFO)
   end
 end
@@ -59,21 +60,21 @@ M.python_paths_hooks = {
   pyright = function(client, python_path)
     -- look and see if there's a project stubs directory
     local analysis_with_extra_paths = nil
-    local maybe_stubs = Path.new(client.config.root_dir, ".stubs")
+    local maybe_stubs = Path.new(client.root_dir or client.config.root_dir, ".stubs")
     if maybe_stubs:exists() then
       analysis_with_extra_paths = {
         extraPaths = { maybe_stubs:absolute() },
       }
     end
     -- modify our settings
-    client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+    client.settings = vim.tbl_deep_extend("force", client.settings or client.config.settings, {
       python = {
         pythonPath = python_path,
         analysis = analysis_with_extra_paths,
       },
     })
     -- notify the server
-    client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    client.notify("workspace/didChangeConfiguration", { settings = nil })
   end,
   pylsp = function(client, python_path)
     local command = python_path .. " -c 'import site; print(site.getsitepackages()[0])'"
@@ -86,7 +87,7 @@ M.python_paths_hooks = {
 
     local extra_paths = util.lookup(client, "config", "settings", "pylsp", "plugins", "jedi", "extra_paths") or {}
     table.insert(extra_paths, tostring(site_packages))
-    client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+    client.settings = vim.tbl_deep_extend("force", client.settings or client.config.settings, {
       pylsp = {
         plugins = {
           jedi = {
@@ -95,7 +96,7 @@ M.python_paths_hooks = {
         },
       },
     })
-    client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+    client.notify("workspace/didChangeConfiguration", { settings = nil })
   end,
 }
 
@@ -152,10 +153,10 @@ function M.set_client_venv_paths(client, bufnr)
   end
 
   -- then check/set our already-done flag
-  if client.config.venv_check_done then
+  if client.venv_check_done then
     return
   else
-    client.config.venv_check_done = true
+    client.venv_check_done = true
   end
 
   local venv = M.find_venv(vim.api.nvim_buf_get_name(bufnr))
