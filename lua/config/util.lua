@@ -116,4 +116,18 @@ function M.toggle_global_diagnostics()
   end
 end
 
+-- enable or disable diagnostics in the current buffer based on our state
+function M.update_current_buffer_diagnostics()
+  -- find our current state
+  local buf_id = vim.api.nvim_get_current_buf()
+  local buf_state = M.diagnostic_state[buf_id]
+  local global_state = M.diagnostic_state[-1]
+
+  if buf_state or (buf_state == nil and global_state) then
+    vim.diagnostic.enable(true, { bufnr = buf_id })
+  else
+    vim.diagnostic.enable(false, { bufnr = buf_id })
+  end
+end
+
 return M
