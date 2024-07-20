@@ -1,9 +1,4 @@
--- if true then
---   return {}
--- end
-
 return {
-
   -- change trouble config
   {
     "folke/trouble.nvim",
@@ -313,7 +308,6 @@ return {
 
   {
     "stevearc/aerial.nvim",
-    -- cond = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
@@ -325,16 +319,16 @@ return {
       --   },
       -- },
     },
-    keys = {
-      {
-        "<leader>cs",
-        function()
-          require("aerial").toggle()
-          -- vim.cmd.wincmd("=")
-        end,
-        desc = "Toggle Aerial",
-      },
-    },
+    -- keys = {
+    --   {
+    --     "<leader>cs",
+    --     function()
+    --       require("aerial").toggle()
+    --       -- vim.cmd.wincmd("=")
+    --     end,
+    --     desc = "Toggle Aerial",
+    --   },
+    -- },
     opts = {
       layout = {
         default_direction = "prefer_left",
