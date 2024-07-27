@@ -24,7 +24,6 @@ reorganize
 api
 tmux
 unsatisfiable
-unsatisfiable
 traceback
 localhost
 unserializable
@@ -44,3 +43,4 @@ subshell
 homebrew
 nvim
 neovim
+UUIDs

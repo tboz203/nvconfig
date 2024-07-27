@@ -15,7 +15,7 @@ vim.o.linebreak = true
 -- vim.o.wrapscan = false
 vim.o.relativenumber = false
 
-vim.opt.listchars = { tab = ">-", trail = "-", extends = "$", precedes = "$" }
+-- vim.opt.listchars = { tab = ">-", trail = "-", extends = "$", precedes = "$" }
 vim.opt.spelloptions:append("camel")
 
 -- vim.opt.directory:append("~/.vim/swap//")
