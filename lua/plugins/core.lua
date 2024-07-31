@@ -121,7 +121,7 @@ return {
       init = function()
         require("lazyvim.util").lsp.on_attach(function(_, buffer)
           -- stylua: ignore
-          vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
+          vim.keymap.set("n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
           vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
         end)
       end,
@@ -133,10 +133,10 @@ return {
       servers = {
         -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
-        cucumber_language_server = {
-          autostart = false,
-          cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
-        },
+        -- cucumber_language_server = {
+        --   autostart = false,
+        --   cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
+        -- },
       },
       -- you can do any additional lsp server setup here
       -- return true if you don't want this server to be setup with lspconfig
@@ -223,7 +223,7 @@ return {
         -- need to figure out a way to reliably install my own tree-sitter-cli
         -- package into cucumber's node_modules...
         "bash-language-server",
-        "cucumber-language-server",
+        -- "cucumber-language-server",
         "stylua",
         "shellcheck",
         "shfmt",
@@ -276,13 +276,13 @@ return {
     end,
   },
 
-  { "tpope/vim-fugitive", lazy = false },
-  { "tpope/vim-repeat", lazy = false },
-  { "tpope/vim-sensible", lazy = false },
-  { "tpope/vim-unimpaired", lazy = false },
-  { "towolf/vim-helm", lazy = false },
-  { "sheerun/vim-polyglot", lazy = false },
-  { "godlygeek/tabular", lazy = false, version = "*" },
+  { "tpope/vim-fugitive",                             lazy = false },
+  { "tpope/vim-repeat",                               lazy = false },
+  { "tpope/vim-sensible",                             lazy = false },
+  { "tpope/vim-unimpaired",                           lazy = false },
+  { "towolf/vim-helm",                                lazy = false },
+  { "sheerun/vim-polyglot",                           lazy = false },
+  { "godlygeek/tabular",                              lazy = false, version = "*" },
 
   { "s1n7ax/nvim-window-picker" },
 
@@ -291,7 +291,7 @@ return {
   -- { "echasnovski/mini.nvim" },
   { "echasnovski/mini.ai" },
   { "echasnovski/mini.align" },
-  { "echasnovski/mini.pairs", cond = false },
+  { "echasnovski/mini.pairs",                         cond = false },
   {
     "echasnovski/mini.surround",
     config = true,
@@ -357,9 +357,9 @@ return {
     "folke/flash.nvim",
     --stylua: ignore
     keys = {
-      { "s", false},
-      { "S", false},
-      { "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "s",  false },
+      { "S",  false },
+      { "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
       { "gS", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       -- { "gR", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -384,10 +384,10 @@ return {
       },
     },
     keys = {
-      { "<leader>bb", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
+      { "<leader>bb", "<cmd>BufferLinePick<cr>",      desc = "Pick buffer" },
       { "<leader>bx", "<cmd>BufferLinePickClose<cr>", desc = "Close buffer with pick" },
-      { "<leader>bh", "<cmd>BufferLineMovePrev<cr>", desc = "Move Buffer Left" },
-      { "<leader>bl", "<cmd>BufferLineMoveNext<cr>", desc = "Move Buffer Right" },
+      { "<leader>bh", "<cmd>BufferLineMovePrev<cr>",  desc = "Move Buffer Left" },
+      { "<leader>bl", "<cmd>BufferLineMoveNext<cr>",  desc = "Move Buffer Right" },
       -- LazyVim defined `bl` and `br` to delete buffers left and right
       -- respectively; we're overriding one of those, and clearing the other
       { "<leader>br" },
