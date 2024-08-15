@@ -17,6 +17,7 @@ local function augroup(name, autocmds)
   end
 end
 
+-- keep view position when switching back and forth between buffers
 local auto_win_save_view_state = {}
 augroup("auto_win_save_view", {
   {

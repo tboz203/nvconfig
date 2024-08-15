@@ -23,11 +23,6 @@ vim.keymap.set("n", "<leader>rr", "<cmd>retab! | luado return line:gsub('%s+$', 
 -- vi-style format command
 vim.keymap.set({ "n", "v" }, "Q", "gq", { desc = "Format text" })
 
--- -- alternate mappings for High / Middle / Low
--- vim.keymap.set("n", "<leader>H", "H", { desc = "Move cursor 'High'" })
--- vim.keymap.set("n", "<leader>M", "M", { desc = "Move cursor 'Middle'" })
--- vim.keymap.set("n", "<leader>L", "L", { desc = "Move cursor 'Low'" })
-
 -- the builtin keymaps 'H' and 'L' for moving the cursor "high" and "low" are
 -- overwritten in LazyVim for switching between buffers. to replace them, we
 -- add these, which shadow the notionally similar zz, zt, and zb keymaps
@@ -50,12 +45,3 @@ vim.keymap.set("n", "<leader>cli", function()
     silent norm "aP
   ]])
 end, { desc = "Inspect LSP state" })
-
--- vim.api.nvim_create_autocmd("VimEnter", {
---   once = true,
---   desc = "Create keymaps for scrolling float windows (depends on `plugin/float_scroll.vim`)",
---   callback = function()
---     vim.keymap.set("n", "<C-j>", "<cmd>call float_scroll(v:true)<cr>", { desc = "Scroll float window forwards" })
---     vim.keymap.set("n", "<C-k>", "<cmd>call float_scroll(v:false)<cr>", { desc = "Scroll float window backwards" })
---   end,
--- })

@@ -83,16 +83,6 @@ return {
         layout_config = { prompt_position = "top" },
         sorting_strategy = "ascending",
         winblend = 0,
-        -- mappings = {
-        --   i = {
-        --     -- was looking for "allow editing ripgrep command";
-        --     -- got "put current highlighted line into vim cmd window"
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        --   n = {
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        -- },
       },
     },
   },
@@ -103,51 +93,24 @@ return {
       require("telescope").load_extension("fzf")
     end,
   },
-  -- {
-  --   "debugloop/telescope-undo.nvim",
-  --   keys = {
-  --     { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
-  --   },
-  --   config = function()
-  --     require("telescope").load_extension("undo")
-  --   end,
-  -- },
 
-  -- add tsserver and setup with typescript.nvim instead of lspconfig
+  { import = "lazyvim.plugins.extras.lang.typescript" },
+  { import = "lazyvim.plugins.extras.lang.clangd" },
+  { import = "lazyvim.plugins.extras.lang.ruby" },
+
+  { import = "lazyvim.plugins.extras.ui.mini-starter" },
+  { import = "lazyvim.plugins.extras.lang.json" },
+
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "jose-elias-alvarez/typescript.nvim",
-      init = function()
-        require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
-          vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
-          vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
-        end)
-      end,
-    },
     opts = {
-      -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
       servers = {
-        -- tsserver will be automatically installed with mason and loaded with lspconfig
-        tsserver = {},
         cucumber_language_server = {
-          autostart = false,
-          cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
+          -- autostart = false,
+          -- cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
         },
-      },
-      -- you can do any additional lsp server setup here
-      -- return true if you don't want this server to be setup with lspconfig
-      setup = {
-        -- example to setup with typescript.nvim
-        tsserver = function(_, opts)
-          require("typescript").setup({ server = opts })
-          return true
-        end,
-        -- Specify * to use this function as a fallback for any server
-        -- ["*"] = function(server, opts) end,
       },
     },
     init = function()
@@ -155,12 +118,6 @@ return {
       keys[#keys + 1] = { "<leader>cl", false }
     end,
   },
-
-  -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
-  -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  { import = "lazyvim.plugins.extras.lang.clangd" },
 
   -- ensure particular parsers are included by default
   {
@@ -192,25 +149,14 @@ return {
     end,
   },
 
-  -- use mini.starter instead of alpha
-  { import = "lazyvim.plugins.extras.ui.mini-starter" },
-
-  -- add jsonls and schemastore packages, and setup treesitter for json, json5 and jsonc
-  { import = "lazyvim.plugins.extras.lang.json" },
-
-  -- add any tools you want to have installed below
+  { "williamboman/mason-lspconfig.nvim" },
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
       opts.registries = {
-        "lua:config.mason_registry",
+        -- "lua:config.mason_registry",
         "github:mason-org/mason-registry",
       }
-      -- opts.providers = {
-      --   -- prefer local tooling
-      --   "mason.providers.client",
-      --   "mason.providers.registry-api",
-      -- }
       opts.ui = {
         icons = {
           package_installed = "✓",
@@ -223,7 +169,7 @@ return {
         -- need to figure out a way to reliably install my own tree-sitter-cli
         -- package into cucumber's node_modules...
         "bash-language-server",
-        "cucumber-language-server",
+        -- "cucumber-language-server",
         "stylua",
         "shellcheck",
         "shfmt",
@@ -288,7 +234,6 @@ return {
 
   { import = "lazyvim.plugins.extras.lang.typescript" },
 
-  -- { "echasnovski/mini.nvim" },
   { "echasnovski/mini.ai" },
   { "echasnovski/mini.align" },
   { "echasnovski/mini.pairs", cond = false },
@@ -296,46 +241,19 @@ return {
     "echasnovski/mini.surround",
     config = true,
     lazy = false,
-    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
   },
-  -- { "echasnovski/mini.animate", cond = false },
-
-  -- {
-  --   "folke/which-key.nvim",
-  --   cond = false,
-  --   event = "VeryLazy",
-  -- },
 
   {
     "stevearc/aerial.nvim",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
-      -- {
-      --   "folke/trouble.nvim",
-      --   optional = true,
-      --   keys = {
-      --     { "<leader>cs", false },
-      --   },
-      -- },
     },
-    -- keys = {
-    --   {
-    --     "<leader>cs",
-    --     function()
-    --       require("aerial").toggle()
-    --       -- vim.cmd.wincmd("=")
-    --     end,
-    --     desc = "Toggle Aerial",
-    --   },
-    -- },
     opts = {
       layout = {
         default_direction = "prefer_left",
         preserve_equality = true,
       },
-      -- backends = { "treesitter", "lsp" },
-      -- filter_kind = false,
     },
   },
 
@@ -351,8 +269,6 @@ return {
     },
   },
 
-  -- { import = "lazyvim.plugins.extras.editor.leap" },
-
   {
     "folke/flash.nvim",
     --stylua: ignore
@@ -366,15 +282,6 @@ return {
       -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
-
-  -- {
-  --   "nvim-neo-tree/neo-tree.nvim",
-  --   opts = {
-  --     close_if_last_window = true,
-  --   },
-  -- },
-
-  -- { "<leader>cl", false },
 
   {
     "akinsho/bufferline.nvim",
@@ -434,14 +341,8 @@ return {
 
   {
     "stevearc/conform.nvim",
-    -- opts = function(_, opts)
-    --   opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
-    --     python = { "isort", "black" },
-    --   })
-    -- end,
     opts = {
       formatters_by_ft = {
-        -- sql = { "sleek" },
         sql = { "sql_formatter", "sqlfluff", "pg_format" },
       },
       formatters = {
