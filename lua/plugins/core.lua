@@ -83,16 +83,6 @@ return {
         layout_config = { prompt_position = "top" },
         sorting_strategy = "ascending",
         winblend = 0,
-        -- mappings = {
-        --   i = {
-        --     -- was looking for "allow editing ripgrep command";
-        --     -- got "put current highlighted line into vim cmd window"
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        --   n = {
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        -- },
       },
     },
   },
@@ -103,51 +93,34 @@ return {
       require("telescope").load_extension("fzf")
     end,
   },
-  -- {
-  --   "debugloop/telescope-undo.nvim",
-  --   keys = {
-  --     { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
-  --   },
-  --   config = function()
-  --     require("telescope").load_extension("undo")
-  --   end,
-  -- },
 
-  -- add tsserver and setup with typescript.nvim instead of lspconfig
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "jose-elias-alvarez/typescript.nvim",
-      init = function()
-        require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
-          vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
-          vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
-        end)
-      end,
-    },
     opts = {
       -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
       servers = {
-        -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
+        groovyls = {},
         cucumber_language_server = {
+          -- fun fact: behave's step expressions are incompatible with cucumber's 🙃
           autostart = false,
-          cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
+          -- cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
+          cmd = { "env", "NODENV_VERSION=22.4.1", "cucumber-language-server", "--stdio" },
+          -- root_dir = function()
+          --   require("lazyvim.util").root.get({ normalize = true })
+          -- end,
+          settings = {
+            cucumber = {
+              features = { "features/*.feature" },
+              glue = {
+                "features/steps/**/*.py",
+                "venv/lib/python3.9/site-packages/pftcmt/lib/**/*.py",
+              },
+            },
+          },
         },
-      },
-      -- you can do any additional lsp server setup here
-      -- return true if you don't want this server to be setup with lspconfig
-      setup = {
-        -- example to setup with typescript.nvim
-        tsserver = function(_, opts)
-          require("typescript").setup({ server = opts })
-          return true
-        end,
-        -- Specify * to use this function as a fallback for any server
-        -- ["*"] = function(server, opts) end,
       },
     },
     init = function()

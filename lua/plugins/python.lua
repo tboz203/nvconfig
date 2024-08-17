@@ -106,14 +106,6 @@ return {
           },
         },
       }
-      -- opts.servers.cucumber_language_server = {
-      --   settings = {
-      --     cucumber = {
-      --       features = { "features/*.feature" },
-      --       glue = { "features/steps/**/*.py" },
-      --     },
-      --   },
-      -- },
       return opts
     end,
   },
