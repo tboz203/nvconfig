@@ -27,21 +27,7 @@ end
 
 -- given a filename in a python project, determine its project root directory
 function M.find_root_dir(fname)
-  -- -- first check for `site-packages` in path ancestors
-  -- local root = Path.path.root(fname)
-  -- local ancestor = Path.new(fname)
-  -- while true do
-  --   if ancestor:basename() == "site-packages" then
-  --     -- if we're already in a site-packages directory, don't add anything
-  --     return nil
-  --   end
-  --   if ancestor:absolute() == root then
-  --     break
-  --   end
-  --   ancestor = ancestor:parent()
-  -- end
-
-  -- otherwise look for certain files in each ancestor directory
+  -- look for certain files in each ancestor directory
   -- based on function from pylsp lspconfig; removed `setup.py` to prevent false positives
   local filepath = Path.new(fname)
   filepath = filepath:find_any_upwards(
@@ -152,12 +138,11 @@ function M.set_client_venv_paths(client, bufnr)
     return
   end
 
-  -- then check/set our already-done flag
   if client.venv_check_done then
     return
-  else
-    client.venv_check_done = true
   end
+
+  client.venv_check_done = true
 
   local venv = M.find_venv(vim.api.nvim_buf_get_name(bufnr))
   if venv == nil then

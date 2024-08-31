@@ -3,7 +3,7 @@ local pyutil = require("config.pyutil")
 
 vim.api.nvim_create_user_command("LspAddExtraPath", function(opts)
   local path = opts.fargs[1]
-  for _, client in ipairs(vim.lsp.get_active_clients()) do
+  for _, client in ipairs(vim.lsp.get_clients()) do
     if client.name == "pyright" then
       local extra_paths = util.lookup(client.config.settings, "python", "analysis", "extraPaths") or {}
       table.insert(extra_paths, path)
@@ -46,9 +46,3 @@ require("lazyvim.util").lsp.on_attach(function(client, bufnr)
     })
   end
 end)
-
--- vim.cmd([[
---     " tweaks to indenting
---     set indentkeys-=<:>
---     set indentkeys+=:
--- ]])
