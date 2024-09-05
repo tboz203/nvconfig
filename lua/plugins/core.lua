@@ -37,8 +37,9 @@ return {
       },
       {
         "gf",
-        -- function() require("telescope.builtin").find_files({ search_file = vim.fn.expand("<cfile>") }) end,
-        require("lazyvim.util").pick("find_files", { search_file = vim.fn.expand("<cfile>") }),
+        function()
+          require("lazyvim.util").pick("find_files", { search_file = vim.fn.expand("<cfile>") })
+        end,
         desc = "Telescope to file",
       },
       {
@@ -249,29 +250,26 @@ return {
     end,
   },
 
-  { "tpope/vim-fugitive", lazy = false },
-  { "tpope/vim-repeat", lazy = false },
-  { "tpope/vim-sensible", lazy = false },
-  { "tpope/vim-unimpaired", lazy = false },
-  { "towolf/vim-helm", lazy = false },
-  { "sheerun/vim-polyglot", lazy = false },
-  { "godlygeek/tabular", lazy = false, version = "*" },
+  { "tpope/vim-fugitive" },
+  { "tpope/vim-repeat" },
+  { "tpope/vim-sensible" },
+  { "tpope/vim-sleuth" },
+  { "tpope/vim-unimpaired" },
+  { "towolf/vim-helm", ft = "helm" },
+  -- disabling b/c it seems to be fighting with vim-sleuth
+  { "sheerun/vim-polyglot", cond = false },
+  { "godlygeek/tabular", cmd = "Tabularize", version = "*" },
 
   { "s1n7ax/nvim-window-picker" },
 
   { import = "lazyvim.plugins.extras.lang.typescript" },
 
-  -- { "echasnovski/mini.nvim" },
+  { "echasnovski/mini.nvim", cond = false },
   { "echasnovski/mini.ai" },
   { "echasnovski/mini.align" },
   { "echasnovski/mini.pairs", cond = false },
-  {
-    "echasnovski/mini.surround",
-    config = true,
-    lazy = false,
-    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
-  },
-  -- { "echasnovski/mini.animate", cond = false },
+  { "echasnovski/mini.surround" },
+  { "echasnovski/mini.animate", cond = false },
 
   -- {
   --   "folke/which-key.nvim",
@@ -330,9 +328,9 @@ return {
     "folke/flash.nvim",
     --stylua: ignore
     keys = {
-      { "s", false},
-      { "S", false},
-      { "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "s",  false },
+      { "S",  false },
+      { "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
       { "gS", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
       -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       -- { "gR", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -407,24 +405,64 @@ return {
 
   {
     "stevearc/conform.nvim",
-    -- opts = function(_, opts)
-    --   opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
-    --     python = { "isort", "black" },
-    --   })
-    -- end,
-    opts = {
-      formatters_by_ft = {
+    -- init = function () end
+    opts = function(_, opts)
+      -- attach some noop editorconfig property handlers, so that Neovim's
+      -- editorconfig handling stores those properties in `b:editorconfig`,
+      -- so that `shfmt_nvim` can calculate the correct args
+      local ec_props = require("editorconfig").properties
+      ec_props.binary_next_line = function() end
+      ec_props.switch_case_indent = function() end
+      ec_props.space_redirects = function() end
+      ec_props.function_next_line = function() end
+
+      opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
+        python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
         -- sql = { "sleek" },
         sql = { "sql_formatter", "sqlfluff", "pg_format" },
-      },
-      formatters = {
+        sh = { "shfmt_nvim" },
+      })
+
+      opts.formatters = vim.tbl_extend("force", opts.formatters or {}, {
         sleek = {
           command = "sleek",
         },
         sql_formatter = {
           prepend_args = { "-l", "postgresql" },
         },
-      },
-    },
+        shfmt_nvim = {
+          command = "shfmt",
+          args = function(_, ctx)
+            local args = { "-filename", "$FILENAME" }
+
+            if vim.bo[ctx.buf].expandtab then
+              vim.list_extend(args, { "-i", ctx.shiftwidth })
+            else
+              vim.list_extend(args, { "-i", 0 })
+            end
+
+            local editorconfig = vim.bo[ctx.buf].editorconfig or {}
+
+            if editorconfig["binary_next_line"] == "true" then
+              args[#args + 1] = "--binary-next-line"
+            end
+
+            if editorconfig["switch_case_indent"] ~= "false" then
+              args[#args + 1] = "--case-indent"
+            end
+
+            if editorconfig["space_redirects"] ~= "false" then
+              args[#args + 1] = "--space-redirects"
+            end
+
+            if editorconfig["space_redirects"] ~= "false" then
+              args[#args + 1] = "--space-redirects"
+            end
+
+            return args
+          end,
+        },
+      })
+    end,
   },
 }

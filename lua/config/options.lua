@@ -15,9 +15,14 @@ vim.o.linebreak = true
 -- vim.o.wrapscan = false
 vim.o.relativenumber = false
 
--- vim.opt.listchars = { tab = ">-", trail = "-", extends = "$", precedes = "$" }
+vim.opt.listchars = { tab = ">-", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
 vim.opt.spelloptions:append("camel")
 
 -- vim.opt.directory:append("~/.vim/swap//")
 -- vim.opt.directory:append("~/.vim/gibberish//")
 -- vim.opt.directory:append(".")
+
+vim.o.tabstop = 4
+vim.o.shiftwidth = 0
+vim.o.softtabstop = -1
+vim.o.expandtab = true
