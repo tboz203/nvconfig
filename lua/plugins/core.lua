@@ -441,7 +441,7 @@ return {
               vim.list_extend(args, { "-i", 0 })
             end
 
-            local editorconfig = vim.bo[ctx.buf].editorconfig or {}
+            local editorconfig = vim.b[ctx.buf].editorconfig or {}
 
             if editorconfig["binary_next_line"] == "true" then
               args[#args + 1] = "--binary-next-line"
