@@ -1,3 +1,7 @@
+if true then
+  return {}
+end
+
 return {
   -- change trouble config
   {
@@ -15,49 +19,26 @@ return {
     end,
   },
 
-  -- change some telescope options and a keymap to browse plugin files
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+    opts = {
+      defaults = {
+        layout_strategy = "horizontal",
+        layout_config = { prompt_position = "top" },
+        sorting_strategy = "ascending",
+        winblend = 0,
+      },
     },
+    --stylua: ignore
     keys = {
-      -- add a keymap to browse plugin files
-      {
-        "<leader>fp",
-        -- function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").pick("find_files", { cwd = require("lazy.core.config").options.root }),
-        desc = "Find Plugin File",
-      },
-      {
-        "<leader>sp",
-        -- function() require("telescope.builtin").live_grep({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").pick("live_grep", { cwd = require("lazy.core.config").options.root }),
-        desc = "Grep Plugin Files",
-      },
-      {
-        "gf",
-        function()
-          require("lazyvim.util").pick("find_files", { search_file = vim.fn.expand("<cfile>") })
-        end,
-        desc = "Telescope to file",
-      },
-      {
-        "<leader>fu",
-        require("lazyvim.util").pick("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }),
-        desc = "Find files unrestricted (root dir)",
-      },
-      {
-        "<leader>fU",
-        require("lazyvim.util").pick(
-          "find_files",
-          { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }
-        ),
-        desc = "Find files unrestricted (cwd)",
-      },
+      { "gf", LazyVim.pick("find_files", { search_file = vim.fn.expand("<cfile>") }), desc = "Telescope to file" },
+      { "<leader>fp", LazyVim.pick("find_files", { cwd = require("lazy.core.config").options.root }), desc = "Find Plugin File" },
+      { "<leader>sp", LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root }), desc = "Grep Plugin Files" },
+      { "<leader>fu", LazyVim.pick("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }), desc = "Find files unrestricted (root dir)" },
+      { "<leader>fU", LazyVim.pick( "find_files", { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }), desc = "Find files unrestricted (cwd)" },
       {
         "<leader>su",
-        require("lazyvim.util").pick("live_grep", {
+        LazyVim.pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -67,7 +48,7 @@ return {
       },
       {
         "<leader>sU",
-        require("lazyvim.util").pick("live_grep", {
+        LazyVim.pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -77,64 +58,24 @@ return {
         desc = "Find files unrestricted (cwd)",
       },
     },
-    -- change some options
-    opts = {
-      defaults = {
-        layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
-        sorting_strategy = "ascending",
-        winblend = 0,
-      },
-    },
-  },
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-    config = function()
-      require("telescope").load_extension("fzf")
-    end,
   },
 
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
       servers = {
         tsserver = {},
         groovyls = {},
-        cucumber_language_server = {
-          -- fun fact: behave's step expressions are incompatible with cucumber's 🙃
-          autostart = false,
-          -- cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
-          cmd = { "env", "NODENV_VERSION=22.4.1", "cucumber-language-server", "--stdio" },
-          -- root_dir = function()
-          --   require("lazyvim.util").root.get({ normalize = true })
-          -- end,
-          settings = {
-            cucumber = {
-              features = { "features/*.feature" },
-              glue = {
-                "features/steps/**/*.py",
-                "venv/lib/python3.9/site-packages/pftcmt/lib/**/*.py",
-              },
-            },
-          },
-        },
       },
     },
     init = function()
+      -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       keys[#keys + 1] = { "<leader>cl", false }
     end,
   },
-
-  -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
-  -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  { import = "lazyvim.plugins.extras.lang.clangd" },
 
   -- ensure particular parsers are included by default
   {
@@ -166,13 +107,6 @@ return {
     end,
   },
 
-  -- use mini.starter instead of alpha
-  { import = "lazyvim.plugins.extras.ui.mini-starter" },
-
-  -- add jsonls and schemastore packages, and setup treesitter for json, json5 and jsonc
-  { import = "lazyvim.plugins.extras.lang.json" },
-
-  -- add any tools you want to have installed below
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
@@ -261,8 +195,6 @@ return {
   { "godlygeek/tabular", cmd = "Tabularize", version = "*" },
 
   { "s1n7ax/nvim-window-picker" },
-
-  { import = "lazyvim.plugins.extras.lang.typescript" },
 
   { "echasnovski/mini.nvim", cond = false },
   { "echasnovski/mini.ai" },

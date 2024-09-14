@@ -39,23 +39,6 @@ function Path:basename()
   return self.filename:gsub("^.*/", "")
 end
 
--- lenient deep table lookup
-function M.lookup(tbl, ...)
-  for _, key in ipairs({ ... }) do
-    if type(tbl) ~= "table" then
-      return nil
-    end
-    tbl = tbl[key]
-  end
-  return tbl
-end
-
--- "print inspect": wrapper for `print(vim.inspect(...))`
-function M.pi(...)
-  return print(vim.inspect(...))
-end
--- may consider making this a global...
-
 -- toggling diagnostics (for LSP, etc)
 M.diagnostic_state = { [-1] = true }
 
@@ -128,6 +111,71 @@ function M.update_current_buffer_diagnostics()
   else
     vim.diagnostic.enable(false, { bufnr = buf_id })
   end
+end
+
+---@generic T
+---@param first T[]
+---@param ... T[]
+---@return T[] set
+--- Combine unique arrays. Mutates and returns the first argument.
+--- To create a new unique array, pass an empty array first.
+function M.set_add(first, ...)
+  ---@alias T T
+  local rest = { ... }
+
+  -- special case: adding a single item
+  if #rest == 1 then
+    local _, other = next(rest)
+    if #other == 1 then
+      local _, right_elem = next(other)
+      for _, item in ipairs(first) do
+        if item == right_elem then
+          return first
+        end
+      end
+      first[#first + 1] = right_elem
+      return first
+    end
+  end
+
+  ---@type table<T, true>
+  --- the set of elements in the first list
+  local element_set = {}
+  for _, elem in ipairs(first) do
+    element_set[elem] = true
+  end
+
+  ---@type table<T, true>
+  --- the set of elements to be added to the first list
+  local additions = {}
+  for _, other in ipairs(rest) do
+    for _, elem in ipairs(other) do
+      if not element_set[elem] then
+        additions[elem] = true
+      end
+    end
+  end
+
+  for elem, _ in pairs(additions) do
+    first[#first + 1] = elem
+  end
+
+  return first
+end
+
+function M.deepen(tbl, ...)
+  local keys = { ... }
+  local curr = tbl
+  for i, key in ipairs(keys) do
+    if type(curr) ~= "table" then
+      error(vim.inspect({ message = "not a table", tbl = tbl, curr = curr, keys = keys, i = i }))
+    end
+    if curr[key] == nil then
+      curr[key] = {}
+    end
+    curr = curr[key]
+  end
+  return curr
 end
 
 return M
