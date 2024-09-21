@@ -1,4 +1,19 @@
 return {
+
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    dependencies = {
+      {
+        "hrsh7th/nvim-cmp",
+        opts = function(_, opts)
+          opts.sources = opts.sources or {}
+          table.insert(opts.sources, { name = "lazydev" })
+        end,
+      },
+    },
+  },
+
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
@@ -6,27 +21,6 @@ return {
         "lua:config.mason_registry",
         "github:mason-org/mason-registry",
       }
-      -- opts.providers = {
-      --   -- prefer local tooling
-      --   "mason.providers.client",
-      --   "mason.providers.registry-api",
-      -- }
-      -- opts.ui = {
-      --   icons = {
-      --     package_installed = "✓",
-      --     package_pending = "➜",
-      --     package_uninstalled = "✗",
-      --   },
-      -- }
-      -- opts.ensure_installed = opts.ensure_installed or {}
-      -- vim.list_extend(opts.ensure_installed, {
-      --   "bash-language-server",
-      --   "cucumber-language-server",
-      --   "stylua",
-      --   "shellcheck",
-      --   "shfmt",
-      --   "yq",
-      -- })
     end,
   },
 
@@ -48,34 +42,18 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
+    --stylua: ignore
       vim.list_extend(opts.ensure_installed, {
-        "bash",
-        "cmake",
-        "dockerfile",
-        "git_config",
-        "git_rebase",
-        "gitattributes",
-        "gitcommit",
-        "gitignore",
-        "ini",
-        "java",
-        "make",
-        "lua",
-        "markdown",
-        "python",
-        "ruby",
-        "rust",
-        "sql",
-        "tsx",
-        "typescript",
-        "vim",
+        "bash", "cmake", "dockerfile", "git_config", "git_rebase",
+        "gitattributes", "gitcommit", "gitignore", "ini", "java", "lua",
+        "make", "markdown", "python", "ruby", "rust", "sql", "tsx",
+        "typescript", "vim",
       })
     end,
   },
 
   {
     "stevearc/conform.nvim",
-    -- init = function () end
     opts = function(_, opts)
       -- attach some noop editorconfig property handlers, so that Neovim's
       -- editorconfig handling stores those properties in `b:editorconfig`,
@@ -88,7 +66,6 @@ return {
 
       opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
         python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
-        -- sql = { "sleek" },
         sql = { "sql_formatter", "sqlfluff", "pg_format" },
         sh = { "shfmt_nvim" },
       })
@@ -101,6 +78,7 @@ return {
           prepend_args = { "-l", "postgresql" },
         },
         shfmt_nvim = {
+          -- attempting to use shfmt to enforce in-editor settings
           command = "shfmt",
           args = function(_, ctx)
             local args = { "-filename", "$FILENAME" }
@@ -113,10 +91,12 @@ return {
 
             local editorconfig = vim.b[ctx.buf].editorconfig or {}
 
+            -- the defaults here use my personal taste. this one will default to false
             if editorconfig["binary_next_line"] == "true" then
               args[#args + 1] = "--binary-next-line"
             end
 
+            -- the rest default to true
             if editorconfig["switch_case_indent"] ~= "false" then
               args[#args + 1] = "--case-indent"
             end
