@@ -1,3 +1,7 @@
+if true then
+  return {}
+end
+
 return {
   -- change trouble config
   {
@@ -15,48 +19,26 @@ return {
     end,
   },
 
-  -- change some telescope options and a keymap to browse plugin files
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+    opts = {
+      defaults = {
+        layout_strategy = "horizontal",
+        layout_config = { prompt_position = "top" },
+        sorting_strategy = "ascending",
+        winblend = 0,
+      },
     },
+    --stylua: ignore
     keys = {
-      -- add a keymap to browse plugin files
-      {
-        "<leader>fp",
-        -- function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").pick("find_files", { cwd = require("lazy.core.config").options.root }),
-        desc = "Find Plugin File",
-      },
-      {
-        "<leader>sp",
-        -- function() require("telescope.builtin").live_grep({ cwd = require("lazy.core.config").options.root }) end,
-        require("lazyvim.util").pick("live_grep", { cwd = require("lazy.core.config").options.root }),
-        desc = "Grep Plugin Files",
-      },
-      {
-        "gf",
-        -- function() require("telescope.builtin").find_files({ search_file = vim.fn.expand("<cfile>") }) end,
-        require("lazyvim.util").pick("find_files", { search_file = vim.fn.expand("<cfile>") }),
-        desc = "Telescope to file",
-      },
-      {
-        "<leader>fu",
-        require("lazyvim.util").pick("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }),
-        desc = "Find files unrestricted (root dir)",
-      },
-      {
-        "<leader>fU",
-        require("lazyvim.util").pick(
-          "find_files",
-          { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }
-        ),
-        desc = "Find files unrestricted (cwd)",
-      },
+      { "gf", LazyVim.pick("find_files", { search_file = vim.fn.expand("<cfile>") }), desc = "Telescope to file" },
+      { "<leader>fp", LazyVim.pick("find_files", { cwd = require("lazy.core.config").options.root }), desc = "Find Plugin File" },
+      { "<leader>sp", LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root }), desc = "Grep Plugin Files" },
+      { "<leader>fu", LazyVim.pick("find_files", { hidden = true, no_ignore = true, no_ignore_parent = true }), desc = "Find files unrestricted (root dir)" },
+      { "<leader>fU", LazyVim.pick( "find_files", { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }), desc = "Find files unrestricted (cwd)" },
       {
         "<leader>su",
-        require("lazyvim.util").pick("live_grep", {
+        LazyVim.pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -66,7 +48,7 @@ return {
       },
       {
         "<leader>sU",
-        require("lazyvim.util").pick("live_grep", {
+        LazyVim.pick("live_grep", {
           vimgrep_arguments = vim.list_extend(
             vim.list_slice(require("telescope.config").values.vimgrep_arguments),
             { "-uu" }
@@ -76,91 +58,24 @@ return {
         desc = "Find files unrestricted (cwd)",
       },
     },
-    -- change some options
-    opts = {
-      defaults = {
-        layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
-        sorting_strategy = "ascending",
-        winblend = 0,
-        -- mappings = {
-        --   i = {
-        --     -- was looking for "allow editing ripgrep command";
-        --     -- got "put current highlighted line into vim cmd window"
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        --   n = {
-        --     ["<C-f>"] = "edit_command_line",
-        --   },
-        -- },
-      },
-    },
   },
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-    config = function()
-      require("telescope").load_extension("fzf")
-    end,
-  },
-  -- {
-  --   "debugloop/telescope-undo.nvim",
-  --   keys = {
-  --     { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
-  --   },
-  --   config = function()
-  --     require("telescope").load_extension("undo")
-  --   end,
-  -- },
 
-  -- add tsserver and setup with typescript.nvim instead of lspconfig
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "jose-elias-alvarez/typescript.nvim",
-      init = function()
-        require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
-          vim.keymap.set("n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
-          vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
-        end)
-      end,
-    },
     opts = {
-      -- autoformat = false,
       -- list active formatters when formatting
       format_notify = true,
       servers = {
-        -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
-        -- cucumber_language_server = {
-        --   autostart = false,
-        --   cmd = { "env", "NODENV_VERSION=16.19.0", "cucumber-language-server", "--stdio" },
-        -- },
-      },
-      -- you can do any additional lsp server setup here
-      -- return true if you don't want this server to be setup with lspconfig
-      setup = {
-        -- example to setup with typescript.nvim
-        tsserver = function(_, opts)
-          require("typescript").setup({ server = opts })
-          return true
-        end,
-        -- Specify * to use this function as a fallback for any server
-        -- ["*"] = function(server, opts) end,
+        groovyls = {},
       },
     },
     init = function()
+      -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       keys[#keys + 1] = { "<leader>cl", false }
     end,
   },
-
-  -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
-  -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  { import = "lazyvim.plugins.extras.lang.clangd" },
 
   -- ensure particular parsers are included by default
   {
@@ -192,13 +107,6 @@ return {
     end,
   },
 
-  -- use mini.starter instead of alpha
-  { import = "lazyvim.plugins.extras.ui.mini-starter" },
-
-  -- add jsonls and schemastore packages, and setup treesitter for json, json5 and jsonc
-  { import = "lazyvim.plugins.extras.lang.json" },
-
-  -- add any tools you want to have installed below
   {
     "williamboman/mason.nvim",
     opts = function(_, opts)
@@ -276,29 +184,24 @@ return {
     end,
   },
 
-  { "tpope/vim-fugitive",                             lazy = false },
-  { "tpope/vim-repeat",                               lazy = false },
-  { "tpope/vim-sensible",                             lazy = false },
-  { "tpope/vim-unimpaired",                           lazy = false },
-  { "towolf/vim-helm",                                lazy = false },
-  { "sheerun/vim-polyglot",                           lazy = false },
-  { "godlygeek/tabular",                              lazy = false, version = "*" },
+  { "tpope/vim-fugitive" },
+  { "tpope/vim-repeat" },
+  { "tpope/vim-sensible" },
+  { "tpope/vim-sleuth" },
+  { "tpope/vim-unimpaired" },
+  { "towolf/vim-helm", ft = "helm" },
+  -- disabling b/c it seems to be fighting with vim-sleuth
+  { "sheerun/vim-polyglot", cond = false },
+  { "godlygeek/tabular", cmd = "Tabularize", version = "*" },
 
   { "s1n7ax/nvim-window-picker" },
 
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  -- { "echasnovski/mini.nvim" },
+  { "echasnovski/mini.nvim", cond = false },
   { "echasnovski/mini.ai" },
   { "echasnovski/mini.align" },
-  { "echasnovski/mini.pairs",                         cond = false },
-  {
-    "echasnovski/mini.surround",
-    config = true,
-    lazy = false,
-    -- keys = { "sa", "sd", "sf", "sF", "sh", "sr", "sn" },
-  },
-  -- { "echasnovski/mini.animate", cond = false },
+  { "echasnovski/mini.pairs", cond = false },
+  { "echasnovski/mini.surround" },
+  { "echasnovski/mini.animate", cond = false },
 
   -- {
   --   "folke/which-key.nvim",
@@ -434,24 +337,64 @@ return {
 
   {
     "stevearc/conform.nvim",
-    -- opts = function(_, opts)
-    --   opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
-    --     python = { "isort", "black" },
-    --   })
-    -- end,
-    opts = {
-      formatters_by_ft = {
+    -- init = function () end
+    opts = function(_, opts)
+      -- attach some noop editorconfig property handlers, so that Neovim's
+      -- editorconfig handling stores those properties in `b:editorconfig`,
+      -- so that `shfmt_nvim` can calculate the correct args
+      local ec_props = require("editorconfig").properties
+      ec_props.binary_next_line = function() end
+      ec_props.switch_case_indent = function() end
+      ec_props.space_redirects = function() end
+      ec_props.function_next_line = function() end
+
+      opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
+        python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
         -- sql = { "sleek" },
         sql = { "sql_formatter", "sqlfluff", "pg_format" },
-      },
-      formatters = {
+        sh = { "shfmt_nvim" },
+      })
+
+      opts.formatters = vim.tbl_extend("force", opts.formatters or {}, {
         sleek = {
           command = "sleek",
         },
         sql_formatter = {
           prepend_args = { "-l", "postgresql" },
         },
-      },
-    },
+        shfmt_nvim = {
+          command = "shfmt",
+          args = function(_, ctx)
+            local args = { "-filename", "$FILENAME" }
+
+            if vim.bo[ctx.buf].expandtab then
+              vim.list_extend(args, { "-i", ctx.shiftwidth })
+            else
+              vim.list_extend(args, { "-i", 0 })
+            end
+
+            local editorconfig = vim.b[ctx.buf].editorconfig or {}
+
+            if editorconfig["binary_next_line"] == "true" then
+              args[#args + 1] = "--binary-next-line"
+            end
+
+            if editorconfig["switch_case_indent"] ~= "false" then
+              args[#args + 1] = "--case-indent"
+            end
+
+            if editorconfig["space_redirects"] ~= "false" then
+              args[#args + 1] = "--space-redirects"
+            end
+
+            if editorconfig["space_redirects"] ~= "false" then
+              args[#args + 1] = "--space-redirects"
+            end
+
+            return args
+          end,
+        },
+      })
+    end,
   },
 }

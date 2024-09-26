@@ -36,8 +36,8 @@ vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
 -- toggle diagnostics (for LSP, etc)
-vim.keymap.set("n", "<leader>ud", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
-vim.keymap.set("n", "<leader>uD", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
+vim.keymap.set("n", "<leader>ud", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
+vim.keymap.set("n", "<leader>uD", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
 
 -- LSP debugging
 vim.keymap.set("n", "<leader>cll", "<cmd>LspInfo<cr>", { desc = "LSP Info" })
