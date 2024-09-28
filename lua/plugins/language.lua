@@ -65,7 +65,7 @@ return {
       ec_props.function_next_line = function() end
 
       opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
-        python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
+        python = { "ruff_fix_most", "ruff_format" },
         sql = { "sql_formatter", "sqlfluff", "pg_format" },
         sh = { "shfmt_nvim" },
       })
@@ -111,6 +111,27 @@ return {
 
             return args
           end,
+        },
+        ruff_fix_most = {
+          command = "ruff",
+          args = {
+            "check",
+            "--fix",
+            "--force-exclude",
+            "--select=F,E,I",
+            "--ignore=F401",
+            "--exit-zero",
+            "--no-cache",
+            "--stdin-filename",
+            "$FILENAME",
+            "-",
+          },
+          stdin = true,
+          cwd = require("conform.util").root_file({
+            "pyproject.toml",
+            "ruff.toml",
+            ".ruff.toml",
+          }),
         },
       })
     end,

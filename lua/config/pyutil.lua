@@ -3,6 +3,7 @@ local lazyutil = require("lazy.core.util")
 local util = require("config.util")
 local Path = util.Path
 
+-- add a directory to Pyright's package search path
 ---@param client vim.lsp.Client?
 ---@param ... string
 ---@return nil
@@ -17,7 +18,7 @@ function M.pyright_add_extra_paths(client, ...)
   if client then
     client_list = { client }
   else
-    client_list = vim.lsp.clients({ name = "pyright" })
+    client_list = vim.lsp.get_clients({ name = "pyright" })
   end
 
   for _, client in ipairs(client_list) do
@@ -28,6 +29,7 @@ function M.pyright_add_extra_paths(client, ...)
   end
 end
 
+-- tell pyright which python executable we use
 ---@param client vim.lsp.Client?
 ---@param path string
 ---@return nil
@@ -51,7 +53,7 @@ function M.pyright_set_python_path(client, path)
   end
 end
 
--- toggle pyright lsp between analysing workspace & only open files
+-- toggle Pyright's diagnostic mode between "workspace" and "openFilesOnly"
 ---@return nil
 function M.pyright_toggle_diagnostic_mode()
   for _, client in pairs(vim.lsp.get_clients({ name = "pyright" })) do
@@ -122,6 +124,66 @@ function M.find_venv(fname)
   -- else complain
   vim.notify("Failed to find venv for path: " .. tostring(fpath), vim.log.levels.DEBUG)
   return nil
+end
+
+---@param key string
+---@param value any
+---@return nil
+function M.ruff_change_setting(key, value)
+  -- lua's regular expressions don't allow repeating groups?!? (eg. `(...)*`)
+  -- if not string.match(key, "^%w+(%.%w+)*$") then
+  --   error("Not a valid setting: " .. key)
+  -- end
+
+  -- attempt to evaluate `value` as lua
+  pcall(function()
+    local f = loadstring("return " .. value)
+    if f then
+      value = f()
+    end
+  end)
+
+  ---@type string[]
+  local split_keys = {}
+  for part in string.gmatch(key, "%w+") do
+    split_keys[#split_keys + 1] = part
+  end
+
+  local bottom_key = split_keys[#split_keys]
+  split_keys[#split_keys] = nil
+
+  for _, client in ipairs(vim.lsp.get_clients({ name = "ruff" })) do
+    vim.notify("updating ruff configuration", vim.log.levels.INFO)
+    local settings =
+      vim.tbl_deep_extend("force", util.deepen(client.config, "init_options", "settings"), client.settings or {})
+    local bottom_setting_table = util.deepen(settings, unpack(split_keys))
+    bottom_setting_table[bottom_key] = value
+    client.stop()
+
+    local timer = vim.uv.new_timer()
+    local attempts = 0
+    timer:start(100, 1, function()
+      if not client.is_stopped() and attempts < 300 then
+        vim.notify("ruff not yet stopped", vim.log.levels.INFO)
+        attempts = attempts + 1
+        if attempts > 250 then
+          client.stop(true)
+        end
+        return
+      end
+      vim.notify("ruff is stopped", vim.log.levels.INFO)
+      timer:stop()
+      timer:close()
+      vim.schedule(function()
+        vim.notify("restarting ruff", vim.log.levels.INFO)
+        require("lspconfig").ruff.setup({
+          init_options = {
+            settings = settings,
+          },
+        })
+      end)
+    end)
+  end
 end
 
 return M

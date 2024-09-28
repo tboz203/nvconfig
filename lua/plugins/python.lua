@@ -20,19 +20,11 @@ return {
     init = function()
       require("lazyvim.util").lsp.on_attach(function(client, bufnr)
         local fname = vim.api.nvim_buf_get_name(bufnr)
-        local project_root = pyutil.find_package_root(fname)
-        if project_root then
-          ---@type string?
-          local new_folder = vim.fs.dirname(project_root)
-          for _, ws_folder in ipairs(vim.lsp.buf.list_workspace_folders()) do
-            if ws_folder == new_folder then
-              new_folder = nil
-              break
-            end
-          end
-          if new_folder then
-            vim.lsp.buf.add_workspace_folder(new_folder)
-          end
+        local package_root = pyutil.find_package_root(fname)
+        if package_root then
+          local package_parent = vim.fs.dirname(package_root)
+          require("config.util").lsp_client_add_workspace_folder(client, package_parent)
+          pyutil.pyright_add_extra_paths(client, package_parent)
         end
 
         vim.keymap.set("n", "<leader>cD", pyutil.pyright_toggle_diagnostic_mode, {
@@ -44,13 +36,30 @@ return {
     ---@type PluginLspOpts
     opts = {
       servers = {
+        ruff = {
+          init_options = {
+            settings = {
+              lineLength = 119,
+              logLevel = "debug",
+            },
+          },
+          commands = {
+            RuffChangeSetting = {
+              pyutil.ruff_change_setting,
+              desc = "Change a setting for the Ruff language server",
+              nargs = "+",
+            },
+          },
+        },
         pyright = {
           on_init = function(client)
             if client.root_dir then
               local extra_paths = {}
               local root = Path:new(client.root_dir)
+              -- ensure project root is in our package import search path
               extra_paths[#extra_paths + 1] = tostring(root)
 
+              -- and our stubs directory, if it exists
               local stubs = root / ".stubs"
               if stubs:exists() then
                 extra_paths[#extra_paths + 1] = tostring(stubs)
@@ -58,6 +67,7 @@ return {
 
               pyutil.pyright_add_extra_paths(client, unpack(extra_paths))
 
+              -- set pyright's python path to a venv executable if we find one
               for _, candidate in ipairs({ "venv/pyvenv.cfg", ".venv/pyvenv.cfg" }) do
                 local pyvenv = (root / candidate)
                 if pyvenv:exists() then

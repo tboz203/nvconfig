@@ -20,6 +20,8 @@ function Path:find_upwards(filename)
 end
 
 -- corrected & extended version of `Path:find_upwards`
+---@param ... string
+---@return string?
 function Path:find_any_upwards(...)
   local folder = Path:new(self)
   local root = Path.path.root()
@@ -35,6 +37,7 @@ function Path:find_any_upwards(...)
   return nil
 end
 
+---@return string
 function Path:basename()
   return self.filename:gsub("^.*/", "")
 end
@@ -113,12 +116,12 @@ function M.update_current_buffer_diagnostics()
   end
 end
 
+--- Combine unique arrays. Mutates and returns the first argument.
+--- To create a new unique array, pass an empty array first.
 ---@generic T
 ---@param first T[]
 ---@param ... T[]
 ---@return T[] set
---- Combine unique arrays. Mutates and returns the first argument.
---- To create a new unique array, pass an empty array first.
 function M.set_add(first, ...)
   ---@alias T T
   local rest = { ... }
@@ -163,6 +166,11 @@ function M.set_add(first, ...)
   return first
 end
 
+-- get or create a nested table, following the given chain of lookup keys
+-- note: this mutates `tbl`
+---@param tbl table
+---@param ... string
+---@return table tbl
 function M.deepen(tbl, ...)
   local keys = { ... }
   local curr = tbl
@@ -176,6 +184,37 @@ function M.deepen(tbl, ...)
     curr = curr[key]
   end
   return curr
+end
+
+-- add a workspace folder to a specific LSP client. If a matching workspace
+-- folder already exists, silently do nothing
+---@param client vim.lsp.Client
+---@param folder string
+---@return nil
+function M.lsp_client_add_workspace_folder(client, folder)
+  ---@type lsp.WorkspaceFolder[]
+  local client_ws_folders = client.workspace_folders or {}
+  for _, ws_folder in ipairs(client_ws_folders) do
+    if folder == ws_folder.name then
+      return
+    end
+  end
+
+  ---@type lsp.WorkspaceFolder
+  local new_workspace_folder = {
+    uri = vim.uri_from_fname(folder),
+    name = folder,
+  }
+
+  client.notify("workspace/didChangeWorkspaceFolders", {
+    event = {
+      added = { new_workspace_folder },
+      removed = {},
+    },
+  })
+
+  ---@type lsp.WorkspaceFolder[]
+  client.workspace_folders = vim.list_extend(client.workspace_folders or {}, { new_workspace_folder })
 end
 
 return M
