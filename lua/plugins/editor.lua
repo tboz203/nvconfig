@@ -26,9 +26,15 @@ return {
   {
     "hrsh7th/nvim-cmp",
     optional = true,
-    dependencies = { "hrsh7th/cmp-emoji" },
+    dependencies = {
+      "hrsh7th/cmp-emoji",
+      "dmitmel/cmp-digraphs",
+    },
     opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" })
+      vim.list_extend(opts.sources, {
+        { name = "emoji" },
+        -- { name = "digraphs" },
+      })
     end,
   },
 
