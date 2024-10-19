@@ -29,6 +29,9 @@ return {
     opts = {
       -- list active formatters when formatting
       format_notify = true,
+      -- servers = {
+      --   cucumber_language_server = {},
+      -- },
     },
     init = function()
       -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere

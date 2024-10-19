@@ -4,6 +4,10 @@
 
 vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
 
+-- Set to "solargraph" to use solargraph instead of ruby_lsp.
+-- vim.g.lazyvim_ruby_lsp = "ruby_lsp"
+vim.g.lazyvim_ruby_lsp = "solargraph"
+
 -- vim.lsp.set_log_level(vim.log.levels.DEBUG)
 
 -- vim.o.autowrite = false
