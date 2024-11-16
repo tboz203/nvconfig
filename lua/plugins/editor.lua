@@ -3,6 +3,7 @@ local plugin_root = require("lazy.core.config").options.root
 return {
   {
     "simnalamburt/vim-mundo",
+    cond = false,
     init = function()
       vim.g.mundo_right = 1
     end,
@@ -10,6 +11,33 @@ return {
     keys = {
       { "<leader>uu", vim.cmd.MundoToggle, desc = "Toggle Undotree" },
     },
+  },
+
+  {
+    "debugloop/telescope-undo.nvim",
+    dependencies = {
+      {
+        "nvim-telescope/telescope.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
+    },
+    keys = {
+      { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
+    },
+    opts = {
+      extensions = {
+        undo = {
+          side_by_side = true,
+          layout_config = {
+            preview_width = 0.75,
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("telescope").setup(opts)
+      require("telescope").load_extension("undo")
+    end,
   },
 
   {
