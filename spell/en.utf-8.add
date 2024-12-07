@@ -48,3 +48,5 @@ timestamp
 Powerline
 venv
 scriptlets
+RabbitMQ
+Websockets
