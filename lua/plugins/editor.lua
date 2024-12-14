@@ -51,20 +51,20 @@ return {
     end,
   },
 
-  {
-    "hrsh7th/nvim-cmp",
-    optional = true,
-    dependencies = {
-      "hrsh7th/cmp-emoji",
-      "dmitmel/cmp-digraphs",
-    },
-    opts = function(_, opts)
-      vim.list_extend(opts.sources, {
-        { name = "emoji" },
-        -- { name = "digraphs" },
-      })
-    end,
-  },
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   optional = true,
+  --   dependencies = {
+  --     "hrsh7th/cmp-emoji",
+  --     "dmitmel/cmp-digraphs",
+  --   },
+  --   opts = function(_, opts)
+  --     vim.list_extend(opts.sources, {
+  --       { name = "emoji" },
+  --       -- { name = "digraphs" },
+  --     })
+  --   end,
+  -- },
 
   {
     "akinsho/bufferline.nvim",

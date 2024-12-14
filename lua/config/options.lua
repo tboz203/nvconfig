@@ -8,6 +8,8 @@ vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
 -- vim.g.lazyvim_ruby_lsp = "ruby_lsp"
 vim.g.lazyvim_ruby_lsp = "solargraph"
 
+vim.g.snacks_animate = false
+
 -- vim.lsp.set_log_level(vim.log.levels.DEBUG)
 
 -- vim.o.autowrite = false
@@ -16,7 +18,7 @@ vim.g.lazyvim_ruby_lsp = "solargraph"
 
 vim.o.linebreak = true
 
--- vim.o.wrapscan = false
+vim.o.wrapscan = false
 vim.o.relativenumber = false
 
 vim.opt.listchars = { tab = ">-", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
