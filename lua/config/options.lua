@@ -21,6 +21,8 @@ vim.o.linebreak = true
 vim.o.wrapscan = false
 vim.o.relativenumber = false
 
+vim.o.history = 1e4
+
 vim.opt.listchars = { tab = ">-", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
 vim.opt.spelloptions:append("camel")
 
