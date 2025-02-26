@@ -54,12 +54,18 @@ vim.keymap.set("n", "<leader>clL", "<cmd>LspLog<cr>", { desc = "LSP Log output" 
 vim.keymap.set(
   "n",
   "<leader>cli",
-  [[
-    let @a = execute("lua =vim.lsp.get_active_clients()")
-    noswapfile enew
-    set buftype=nofile bufhidden=hide filetype=lua
-    silent norm "aP
-  ]],
+  -- [[
+  --   let @a = execute("lua =vim.lsp.get_active_clients()")
+  --   noswapfile enew
+  --   set buftype=nofile bufhidden=hide filetype=lua
+  --   silent norm "aP
+  -- ]],
+  function ()
+    local buf = vim.api.nvim_create_buf(false, true)
+    local stuff = vim.split(vim.inspect(vim.lsp.get_clients()), '\n')
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, stuff)
+    vim.api.nvim_open_win(buf, true, {split="right"})
+  end,
   { desc = "Inspect LSP state" }
 )
 

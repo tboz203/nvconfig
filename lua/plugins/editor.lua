@@ -1,6 +1,24 @@
 local plugin_root = require("lazy.core.config").options.root
 
 return {
+
+  {
+    "williamboman/mason.nvim",
+    optional = true,
+    opts = {
+      registries = {
+        "lua:config.mason_registry",
+        "github:mason-org/mason-registry",
+      },
+      ensure_installed = {
+        "stylua",
+        "shellcheck",
+        "shfmt",
+        "flake8",
+      },
+    },
+  },
+
   {
     "simnalamburt/vim-mundo",
     cond = false,
@@ -157,6 +175,7 @@ return {
           LazyVim.pick.open("find_files", { search_file = vim.fn.expand("<cfile>") })
         end,
         desc = "Telescope to file",
+        mode = { "n", "v", "o" },
       },
     },
   },
@@ -172,6 +191,53 @@ return {
     optional = true,
     keys = {
       { "<leader>r", false },
+    },
+  },
+
+  {
+    "folke/persistence.nvim",
+    opts = {
+      need = 2,
+    },
+  },
+
+  {
+    "chrisbra/Colorizer",
+  },
+
+  {
+    "allaman/emoji.nvim",
+    version = "1.0.0", -- optionally pin to a tag
+    ft = "markdown", -- adjust to your needs
+    dependencies = {
+      -- util for handling paths
+      "nvim-lua/plenary.nvim",
+      -- optional for nvim-cmp integration
+      "hrsh7th/nvim-cmp",
+      -- optional for telescope integration
+      "nvim-telescope/telescope.nvim",
+      -- optional for fzf-lua integration via vim.ui.select
+      -- "ibhagwan/fzf-lua",
+    },
+    opts = {
+      -- default is false, also needed for blink.cmp integration!
+      enable_cmp_integration = true,
+    },
+    -- config = function(_, opts)
+    --   require("emoji").setup(opts)
+    --   -- optional for telescope integration
+    --   local ts = require('telescope').load_extension 'emoji'
+    --   vim.keymap.set('n', '<leader>se', ts.emoji, { desc = '[S]earch [E]moji' })
+    -- end,
+    keys = {
+      {
+        "<leader>se",
+        function()
+          require("telescope").load_extension("emoji").emoji()
+        end,
+        desc = "[S]earch [E]moji",
+        mode = { "n", "v", "o" },
+      },
     },
   },
 }

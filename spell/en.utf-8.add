@@ -50,3 +50,6 @@ venv
 scriptlets
 RabbitMQ
 Websockets
+recurse
+wildcard
+bool

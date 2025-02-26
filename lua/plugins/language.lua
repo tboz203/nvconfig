@@ -15,16 +15,6 @@ return {
   -- },
 
   {
-    "williamboman/mason.nvim",
-    opts = function(_, opts)
-      opts.registries = {
-        "lua:config.mason_registry",
-        "github:mason-org/mason-registry",
-      }
-    end,
-  },
-
-  {
     "neovim/nvim-lspconfig",
     opts = {
       -- list active formatters when formatting
@@ -45,12 +35,29 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
-    --stylua: ignore
       vim.list_extend(opts.ensure_installed, {
-        "bash", "cmake", "dockerfile", "git_config", "git_rebase",
-        "gitattributes", "gitcommit", "gitignore", "ini", "java", "lua",
-        "make", "markdown", "python", "ruby", "rust", "sql", "tsx",
-        "typescript", "vim",
+        "bash",
+        "cmake",
+        "dockerfile",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
+        "go",
+        "ini",
+        "java",
+        "jq",
+        "lua",
+        "make",
+        "markdown",
+        "python",
+        "ruby",
+        "rust",
+        "sql",
+        "tsx",
+        "typescript",
+        "vim",
       })
     end,
   },
@@ -138,5 +145,39 @@ return {
         },
       })
     end,
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        spectral = {
+          -- find a spectral ruleset file & tell spectral-language-server about it
+          ---@param params lsp.InitializedParams
+          ---@param config vim.lsp.ClientConfig
+          before_init = function(params, config)
+            local util = require("config.util")
+            local ruleset_path, item_path
+            for _, item in ipairs({ config.root_dir, config.cmd_cwd, "." }) do
+              if item ~= nil then
+                item_path = util.Path:new(item)
+                ruleset_path =
+                  item_path:find_any_upwards(".spectral.yaml", ".spectral.yml", ".spectral.json", ".spectral.js")
+                if ruleset_path ~= nil then
+                  config.settings = config.settings or {}
+                  config.settings.rulesetFile = config.settings.rulesetFile or tostring(ruleset_path)
+                  vim.notify(
+                    string.format("Spectral ruleset file is `%s`", config.settings.rulesetFile),
+                    vim.log.levels.INFO
+                  )
+                  return
+                end
+              end
+            end
+            vim.notify("No Spectral ruleset file found", vim.log.levels.INFO)
+          end,
+        },
+      },
+    },
   },
 }

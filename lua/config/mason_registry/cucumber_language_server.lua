@@ -13,13 +13,12 @@ return require("mason-core.package").new({
     "LSP",
   },
   source = {
-    -- id = "pkg:github/cucumber/language-server@v1.2.0",
-    id = "pkg:github/cucumber/language-server@v1.6.0",
+    id = "pkg:github/cucumber/language-server@v1.2.0",
     build = {
       env = {
-        -- force install with nodejs 22 (currently provided by nodenv)
+        -- force install with nodejs 16
         -- (needs to also be specified in lspconfig)
-        NODENV_VERSION = "22.4.1",
+        NODENV_VERSION = "16.19.0",
         -- replace upstream tree-sitter-cli with locally built & packaged
         -- version to fix GLIBC dependency
         TREE_SITTER_CLI_TARBALL = vim.fn.stdpath("config") .. "/data/tree-sitter-cli.tar.gz",

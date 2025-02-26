@@ -3,6 +3,7 @@
 -- Add any additional options here
 
 vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
+vim.g.node_host_prog = vim.fn.expand("~/.nodenv/versions/22.13.1/bin/node")
 
 -- Set to "solargraph" to use solargraph instead of ruby_lsp.
 -- vim.g.lazyvim_ruby_lsp = "ruby_lsp"
@@ -30,7 +31,17 @@ vim.opt.spelloptions:append("camel")
 -- vim.opt.directory:append("~/.vim/gibberish//")
 -- vim.opt.directory:append(".")
 
+vim.opt.directory:append {"~/.vim/swap//", "~/.vim/gibberish//", "."}
+
 vim.o.tabstop = 4
 vim.o.shiftwidth = 0
 vim.o.softtabstop = -1
 vim.o.expandtab = true
+vim.o.smartindent = false
+
+vim.opt.sessionoptions = { "blank", "buffers", "curdir", "folds", "globals", "help", "localoptions", "options", "skiprtp" , "tabpages", "winsize"}
+vim.o.shada = "!,'100,s1000"
+
+vim.opt.jumpoptions = { "stack", "view" }
+
+vim.opt.diffopt:append { "iwhiteall", "vertical", "closeoff", "hiddenoff", "algorithm:histogram" }
