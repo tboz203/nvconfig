@@ -1,46 +1,4 @@
 local M = {}
----@class Path
-local Path = require("plenary.path")
-M.Path = Path
-
--- overriding Path:find_upwards because as of 2023-09-29 if a matching file is
--- not found, it enters an infinite loop and hangs the whole editor
----@diagnostic disable-next-line
-function Path:find_upwards(filename)
-  local folder = Path:new(self)
-  local root = Path.path.root()
-  while folder:absolute() ~= root do
-    local p = folder:joinpath(filename)
-    if p:exists() then
-      return p
-    end
-    folder = folder:parent()
-  end
-  return nil
-end
-
--- corrected & extended version of `Path:find_upwards`
----@param ... string
----@return string?
-function Path:find_any_upwards(...)
-  local folder = Path:new(self)
-  local root = Path.path.root()
-  while folder:absolute() ~= root do
-    for _, filename in pairs({ ... }) do
-      local p = folder:joinpath(filename)
-      if p:exists() then
-        return p
-      end
-    end
-    folder = folder:parent()
-  end
-  return nil
-end
-
----@return string
-function Path:basename()
-  return self.filename:gsub("^.*/", "")
-end
 
 -- toggling diagnostics (for LSP, etc)
 M.diagnostic_state = { [-1] = true }
@@ -215,6 +173,50 @@ function M.lsp_client_add_workspace_folder(client, folder)
 
   ---@type lsp.WorkspaceFolder[]
   client.workspace_folders = vim.list_extend(client.workspace_folders or {}, { new_workspace_folder })
+end
+
+function M.clean_win_path()
+  if vim.env.OS ~= "Windows_NT" then
+    -- This isn't windows!
+    return
+  end
+
+  -- get our PATH list
+  local path = vim.split(vim.env.PATH, ";")
+  -- vim.notify(string.format("Found path: %s", vim.inspect(path)))
+
+  -- define directory rejection rules
+  local reject_pattern = vim.regex("\\v\\c<(git\\\\mingw64|git\\\\usr\\\\bin|cygwin)>")
+
+  -- build a "clean" path list
+  local clean_path = {}
+  for _, dir in ipairs(path) do
+    if not reject_pattern:match_str(dir) then
+      -- vim.notify(string.format("Accepting: %s", dir))
+      table.insert(clean_path, dir)
+      -- else
+      --   vim.notify(string.format("Rejecting: %s", dir))
+    end
+  end
+
+  -- replace the PATH
+  vim.env.PATH = table.concat(clean_path, ";")
+  -- vim.notify(string.format("New path is: %s", vim.env.PATH))
+end
+
+function M.fix_shell_settings()
+  local path_sep = vim.split(package.config, "\n")[1]
+  local shell_parts = vim.split(vim.o.shell, path_sep)
+  local shell = shell_parts[#shell_parts]
+  -- vim.notify(string.format("Shell is %s (%s)", shell, vim.o.shell))
+
+  if string.find(shell, "sh") and string.find(vim.o.shellcmdflag, "^/") then
+    -- vim.notify("Changing shellcmdflag to `-c`")
+    vim.o.shellcmdflag = "-c"
+  elseif string.find(shell, "cmd") and string.find(vim.o.shellcmdflag, "^-") then
+    -- vim.notify("Changing shellcmdflag to `/s /c`")
+    vim.o.shellcmdflag = "/s /c"
+  end
 end
 
 return M

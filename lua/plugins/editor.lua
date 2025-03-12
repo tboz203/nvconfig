@@ -1,4 +1,4 @@
-if true then return {} end
+-- if true then return {} end
 
 local plugin_root = require("lazy.core.config").options.root
 

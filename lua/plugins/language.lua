@@ -1,4 +1,17 @@
-if true then return {} end
+-- if true then return {} end
+
+-- if true then
+--   return {
+--     {
+--       "nvim-treesitter/nvim-treesitter",
+--       optional = true,
+--       opts = function(_, opts)
+--         -- turn this *all* the way off
+--         opts.ensure_installed = {}
+--       end,
+--     },
+--   }
+-- end
 
 return {
 
