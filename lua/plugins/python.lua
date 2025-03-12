@@ -1,3 +1,5 @@
+if true then return {} end
+
 local pyutil = require("config.pyutil")
 local Path = require("plenary.path")
 
