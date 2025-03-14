@@ -1,3 +1,5 @@
+---@class LazyUtilCore
+-- local M = require("lazy.core.util")
 local M = {}
 
 -- toggling diagnostics (for LSP, etc)

@@ -2,12 +2,12 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
-vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
-vim.g.node_host_prog = vim.fn.expand("~/.nodenv/versions/22.13.1/bin/node")
+-- vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
+-- vim.g.node_host_prog = vim.fn.expand("~/.nodenv/versions/22.13.1/bin/node")
 
 -- Set to "solargraph" to use solargraph instead of ruby_lsp.
 -- vim.g.lazyvim_ruby_lsp = "ruby_lsp"
-vim.g.lazyvim_ruby_lsp = "solargraph"
+-- vim.g.lazyvim_ruby_lsp = "solargraph"
 
 vim.g.snacks_animate = false
 
@@ -27,11 +27,11 @@ vim.o.history = 1e4
 vim.opt.listchars = { tab = ">-", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
 vim.opt.spelloptions:append("camel")
 
--- vim.opt.directory:append("~/.vim/swap//")
--- vim.opt.directory:append("~/.vim/gibberish//")
--- vim.opt.directory:append(".")
+---@diagnostic disable-next-line
+local swapdir = vim.fs.joinpath(vim.fn.stdpath("state"), "swap")
 
-vim.opt.directory:append({ "~/.vim/swap//", "~/.vim/gibberish//", "." })
+vim.fn.mkdir(swapdir, "p")
+vim.opt.directory = { swapdir .. "//", "." }
 
 vim.o.tabstop = 4
 vim.o.shiftwidth = 0
