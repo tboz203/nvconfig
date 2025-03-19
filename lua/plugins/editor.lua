@@ -12,12 +12,12 @@ return {
         "lua:config.mason_registry",
         "github:mason-org/mason-registry",
       },
-      ensure_installed = {
-        "stylua",
-        "shellcheck",
-        "shfmt",
-        "flake8",
-      },
+      -- ensure_installed = {
+      --   "stylua",
+      --   "shellcheck",
+      --   "shfmt",
+      --   "flake8",
+      -- },
     },
   },
 

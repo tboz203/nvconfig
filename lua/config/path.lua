@@ -23,9 +23,9 @@ function Path:new(...)
   end
 
   -- TODO: Should probably remove and dumb stuff like double seps, periods in the middle, etc.
-  local sep = path.sep
+  local sep = Path.path.sep
   if type(path_input) == "table" then
-    sep = path_input.sep or path.sep
+    sep = path_input.sep or Path.path.sep
     path_input.sep = nil
   end
 
