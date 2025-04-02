@@ -1,6 +1,5 @@
 -- Autocmds are automatically loaded on the VeryLazy event
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
--- Add any additional autocmds here
 
 -- set diagnostics state for buffer from global for new buffers
 vim.api.nvim_create_autocmd("BufReadPost", {
