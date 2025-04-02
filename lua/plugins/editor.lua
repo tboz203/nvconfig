@@ -1,3 +1,5 @@
+-- if true then return {} end
+
 local plugin_root = require("lazy.core.config").options.root
 
 return {
@@ -10,12 +12,12 @@ return {
         "lua:config.mason_registry",
         "github:mason-org/mason-registry",
       },
-      ensure_installed = {
-        "stylua",
-        "shellcheck",
-        "shfmt",
-        "flake8",
-      },
+      -- ensure_installed = {
+      --   "stylua",
+      --   "shellcheck",
+      --   "shfmt",
+      --   "flake8",
+      -- },
     },
   },
 

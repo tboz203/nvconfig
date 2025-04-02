@@ -56,3 +56,5 @@ bool
 config
 args
 kwargs
+NOTAM
+NOTAMs
