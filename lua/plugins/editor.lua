@@ -6,12 +6,12 @@ return {
 
   {
     "williamboman/mason.nvim",
-    optional = true,
+    -- optional = true,
     opts = {
-      registries = {
-        "lua:config.mason_registry",
-        "github:mason-org/mason-registry",
-      },
+      -- registries = {
+      --   -- "lua:config.mason_registry",
+      --   "github:mason-org/mason-registry",
+      -- },
       -- ensure_installed = {
       --   "stylua",
       --   "shellcheck",

@@ -40,7 +40,6 @@ vim.o.expandtab = true
 vim.o.smartindent = false
 
 vim.opt.sessionoptions = {
-  "blank",
   "buffers",
   "curdir",
   "folds",
