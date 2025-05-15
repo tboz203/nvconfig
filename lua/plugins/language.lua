@@ -1,5 +1,3 @@
--- if true then return {} end
-
 -- if true then
 --   return {
 --     {
@@ -14,20 +12,6 @@
 -- end
 
 return {
-
-  -- {
-  --   "folke/lazydev.nvim",
-  --   ft = "lua",
-  --   dependencies = {
-  --     {
-  --       "hrsh7th/nvim-cmp",
-  --       opts = function(_, opts)
-  --         opts.sources = opts.sources or {}
-  --         table.insert(opts.sources, { name = "lazydev" })
-  --       end,
-  --     },
-  --   },
-  -- },
 
   {
     "neovim/nvim-lspconfig",
@@ -79,7 +63,7 @@ return {
 
   {
     "stevearc/conform.nvim",
-    opts = function(_, opts)
+    opts = function()
       -- attach some noop editorconfig property handlers, so that Neovim's
       -- editorconfig handling stores those properties in `b:editorconfig`,
       -- so that `shfmt_nvim` can calculate the correct args
@@ -88,19 +72,30 @@ return {
       ec_props.switch_case_indent = function() end
       ec_props.space_redirects = function() end
       ec_props.function_next_line = function() end
+    end,
+  },
 
-      opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
         python = { "ruff_fix_most", "ruff_format" },
-        sql = { "sql_formatter", "sqlfluff", "pg_format" },
         sh = { "shfmt_nvim" },
-      })
+      },
 
-      opts.formatters = vim.tbl_extend("force", opts.formatters or {}, {
-        sleek = {
-          command = "sleek",
-        },
-        sql_formatter = {
-          prepend_args = { "-l", "postgresql" },
+      formatters = {
+        sqlfluff = {
+          command = "/home/linuxbrew/.linuxbrew/bin/sqlfluff",
+          args = { "fix", "-" },
+          stdin = true,
+          cwd = require("conform.util").root_file({
+            ".sqlfluff",
+            "pep8.ini",
+            "pyproject.toml",
+            "setup.cfg",
+            "tox.ini",
+          }),
+          require_cwd = true,
         },
         shfmt_nvim = {
           -- attempting to use shfmt to enforce in-editor settings
@@ -158,8 +153,8 @@ return {
             ".ruff.toml",
           }),
         },
-      })
-    end,
+      },
+    },
   },
 
   -- {
@@ -195,4 +190,19 @@ return {
   --     },
   --   },
   -- },
+
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters = {
+        sqlfluff = {
+          cmd = "sqlfluff",
+          args = {
+            "lint",
+            "--format=json",
+          },
+        },
+      },
+    },
+  },
 }
