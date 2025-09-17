@@ -19,9 +19,6 @@ return {
       -- list active formatters when formatting
       format_notify = true,
       inlay_hints = { enabled = false },
-      -- servers = {
-      --   cucumber_language_server = {},
-      -- },
     },
     init = function()
       -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere
@@ -80,7 +77,6 @@ return {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
-        python = { "ruff_fix_most", "ruff_format" },
         sh = { "shfmt_nvim" },
         go = { lsp_format = "prefer" },
         -- sql = { "pg_format", "sqlfluff" },
@@ -146,27 +142,6 @@ return {
 
             return args
           end,
-        },
-        ruff_fix_most = {
-          command = "ruff",
-          args = {
-            "check",
-            "--fix",
-            "--force-exclude",
-            "--select=F,E,I",
-            "--ignore=F401",
-            "--exit-zero",
-            "--no-cache",
-            "--stdin-filename",
-            "$FILENAME",
-            "-",
-          },
-          stdin = true,
-          cwd = require("conform.util").root_file({
-            "pyproject.toml",
-            "ruff.toml",
-            ".ruff.toml",
-          }),
         },
       },
     },

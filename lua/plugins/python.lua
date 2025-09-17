@@ -3,6 +3,39 @@
 local pyutil = require("config.pyutil")
 
 return {
+
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        python = { "ruff_fix_most", "ruff_format" },
+      },
+      formatters = {
+        ruff_fix_most = {
+          command = "ruff",
+          args = {
+            "check",
+            "--fix",
+            "--force-exclude",
+            "--select=F,E,I",
+            "--ignore=F401",
+            "--exit-zero",
+            "--no-cache",
+            "--stdin-filename",
+            "$FILENAME",
+            "-",
+          },
+          stdin = true,
+          cwd = require("conform.util").root_file({
+            "pyproject.toml",
+            "ruff.toml",
+            ".ruff.toml",
+          }),
+        },
+      },
+    },
+  },
+
   {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
@@ -21,6 +54,9 @@ return {
     ---@type PluginLspOpts
     opts = {
       servers = {
+        pylsp = {
+          autostart = false,
+        },
         ruff = {
           init_options = {
             settings = {
