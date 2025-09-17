@@ -5,8 +5,9 @@ local plugin_root = require("lazy.core.config").options.root
 return {
 
   {
-    "williamboman/mason.nvim",
-    optional = true,
+    -- a package manager
+    "mason-org/mason.nvim",
+    -- optional = true,
     opts = {
       registries = {
         -- "lua:config.mason_registry",
@@ -16,12 +17,12 @@ return {
         "stylua",
         "shellcheck",
         "shfmt",
-        "flake8",
       },
     },
   },
 
   {
+    -- an undo tree navigator
     "simnalamburt/vim-mundo",
     cond = false,
     init = function()
@@ -34,6 +35,7 @@ return {
   },
 
   {
+    -- an undo tree navigator
     "debugloop/telescope-undo.nvim",
     dependencies = {
       {
@@ -209,8 +211,8 @@ return {
 
   {
     "allaman/emoji.nvim",
-    version = "1.0.0", -- optionally pin to a tag
-    ft = "markdown", -- adjust to your needs
+    -- version = "1.0.0", -- optionally pin to a tag
+    -- ft = "markdown", -- adjust to your needs
     dependencies = {
       -- util for handling paths
       "nvim-lua/plenary.nvim",
@@ -239,6 +241,48 @@ return {
         end,
         desc = "[S]earch [E]moji",
         mode = { "n", "v", "o" },
+      },
+    },
+  },
+
+  {
+    "stevearc/aerial.nvim",
+    opts = {
+      layout = {
+        width = 40,
+      },
+    },
+  },
+
+  {
+    "olimorris/codecompanion.nvim",
+    cond = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "ravitemer/mcphub.nvim",
+    },
+    opts = {
+      strategies = {
+        chat = {
+          adapter = "gemini",
+        },
+        inline = {
+          adapter = "gemini",
+        },
+        cmd = {
+          adapter = "gemini",
+        },
+      },
+      adapters = {
+        gemini = function()
+          return require("codecompanion.adapters").extend("gemini", {
+            env = {
+              -- not quite correct...
+              api_key = "cmd:gcloud auth application-default print-access-token",
+            },
+          })
+        end,
       },
     },
   },

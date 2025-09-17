@@ -18,6 +18,7 @@ return {
     opts = {
       -- list active formatters when formatting
       format_notify = true,
+      inlay_hints = { enabled = false },
       -- servers = {
       --   cucumber_language_server = {},
       -- },
@@ -81,21 +82,35 @@ return {
       formatters_by_ft = {
         python = { "ruff_fix_most", "ruff_format" },
         sh = { "shfmt_nvim" },
+        go = { lsp_format = "prefer" },
+        -- sql = { "pg_format", "sqlfluff" },
+        sql = {},
       },
 
       formatters = {
         sqlfluff = {
-          command = "/home/linuxbrew/.linuxbrew/bin/sqlfluff",
-          args = { "fix", "-" },
+          args = { "fix", "--dialect=postgres", "-" },
           stdin = true,
           cwd = require("conform.util").root_file({
             ".sqlfluff",
+            "flyway.conf",
             "pep8.ini",
             "pyproject.toml",
             "setup.cfg",
             "tox.ini",
+            ".git",
           }),
-          require_cwd = true,
+          require_cwd = false,
+          -- only use this formatter when a `.sqlfluff` file is found
+          condition = function(ctx)
+            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+          end,
+        },
+        pg_format = {
+          -- only use this formatter when a `.sqlfluff` file is found
+          condition = function(ctx)
+            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+          end,
         },
         shfmt_nvim = {
           -- attempting to use shfmt to enforce in-editor settings
@@ -192,8 +207,57 @@ return {
   -- },
 
   {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        gopls = {
+          settings = {
+            gopls = {
+              analyses = {
+                -- Incorrect or missing package comment
+                ST1000 = false,
+                -- Dot imports are discouraged
+                ST1001 = false,
+                -- Poorly chosen identifier
+                ST1003 = false,
+              },
+            },
+          },
+        },
+        lemminx = {
+          cmd = {
+            "lemminx",
+            "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
+          },
+          -- settings = {
+          --   xml = {
+          --     server = {
+          --       vmargs = {
+          --         "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
+          --       },
+          --     },
+          --     -- format = {
+          --     --   -- enabled = false,
+          --     --   -- splitAttributes = true,
+          --     --   -- joinCDATALines = false,
+          --     --   -- joinCommentLines = false,
+          --     --   -- formatComments = false,
+          --     --   -- joinContentLines = false,
+          --     --   -- spaceBeforeEmptyCloseTag = false,
+          --     -- },
+          --   },
+          -- },
+        },
+      },
+    },
+  },
+
+  {
     "mfussenegger/nvim-lint",
     opts = {
+      linters_by_ft = {
+        sql = {},
+      },
       linters = {
         sqlfluff = {
           cmd = "sqlfluff",
@@ -205,4 +269,6 @@ return {
       },
     },
   },
+
+  { "lark-parser/vim-lark-syntax" },
 }

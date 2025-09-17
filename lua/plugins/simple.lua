@@ -20,6 +20,6 @@ return {
   { "echasnovski/mini.ai", cond = false },
   { "echasnovski/mini.align", cond = false },
   { "echasnovski/mini.pairs", cond = false },
-  { "echasnovski/mini.surround", cond = false },
+  -- { "echasnovski/mini.surround", cond = false },
   { "echasnovski/mini.animate", cond = false },
 }

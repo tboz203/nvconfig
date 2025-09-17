@@ -38,6 +38,7 @@ vim.o.shiftwidth = 0
 vim.o.softtabstop = -1
 vim.o.expandtab = true
 vim.o.smartindent = false
+vim.o.breakindent = true
 
 vim.opt.sessionoptions = {
   "buffers",

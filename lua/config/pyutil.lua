@@ -26,7 +26,7 @@ function M.pyright_add_extra_paths(client, ...)
   local extra_paths = util.deepen(settings, "python", "analysis", "extraPaths")
   util.set_add(extra_paths, paths)
   client.notify("workspace/didChangeConfiguration", { settings = settings })
-  vim.notify(string.format("Pyright extra paths set to: %s", vim.inspect(extra_paths)))
+  -- vim.notify(string.format("Pyright extra paths set to: %s", vim.inspect(extra_paths)))
 end
 
 -- tell pyright which python executable to use
@@ -50,7 +50,7 @@ function M.pyright_set_python_path(client, path)
   })
 
   client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
-  vim.notify(string.format("Pyright python path set to: %s", vim.inspect(path)))
+  -- vim.notify(string.format("Pyright python path set to: %s", vim.inspect(path)))
 end
 
 -- toggle Pyright's diagnostic mode between "workspace" and "openFilesOnly"
@@ -82,7 +82,7 @@ function M.pyright_toggle_diagnostic_mode(client)
     },
   })
   client.notify("workspace/didChangeConfiguration", { settings = nil })
-  vim.notify(string.format("Set Pyright diagnostic mode to `%s`", new_mode), vim.log.levels.INFO)
+  -- vim.notify(string.format("Set Pyright diagnostic mode to `%s`", new_mode), vim.log.levels.INFO)
 end
 
 -- find closest ancestor of path `fname` whose parent directory does not contain an `__init__.py`
@@ -114,7 +114,7 @@ end
 -- find a python virtual environment based on a filename. currently only searches along parents path for venvs
 function M.find_venv(fname)
   local fpath = Path(fname):absoluted()
-  vim.notify(string.format("Looking for venv at: %s", fpath))
+  -- vim.notify(string.format("Looking for venv at: %s", fpath))
 
   local venv_names = {
     "venv/pyvenv.cfg",
@@ -127,14 +127,14 @@ function M.find_venv(fname)
   -- if we find that,
   if pyvenv_cfg then
     -- return the path to the `venv` folder
-    vim.notify(string.format("Found pyvenv.cfg at: %s", pyvenv_cfg))
-    vim.notify(string.format("Returning: %s", tostring(pyvenv_cfg:parent())))
+    -- vim.notify(string.format("Found pyvenv.cfg at: %s", pyvenv_cfg))
+    -- vim.notify(string.format("Returning: %s", tostring(pyvenv_cfg:parent())))
     return tostring(pyvenv_cfg:parent())
   end
 
   -- else complain
   -- vim.notify("Failed to find venv for path: " .. tostring(fpath), vim.log.levels.DEBUG)
-  vim.notify("Failed to find venv for path: " .. tostring(fpath))
+  -- vim.notify("Failed to find venv for path: " .. tostring(fpath))
   return nil
 end
 
@@ -207,9 +207,9 @@ end
 ---@param client vim.lsp.Client
 ---@return nil
 function M.pyright_on_init(client)
-  vim.notify("Initializing Pyright LSP client")
+  -- vim.notify("Initializing Pyright LSP client")
   if client.root_dir then
-    vim.notify(string.format("Root dir is: %s", client.root_dir))
+    -- vim.notify(string.format("Root dir is: %s", client.root_dir))
     local extra_paths = {}
     local root = Path(client.root_dir)
     -- ensure project root is in our package import search path
@@ -229,15 +229,15 @@ function M.pyright_on_init(client)
       venv = Path(venv)
       for _, candidate in ipairs({ "bin/python", "scripts/python.exe" }) do
         local executable = (venv / candidate):normalized()
-        vim.notify(string.format("Checking: %s", executable))
+        -- vim.notify(string.format("Checking: %s", executable))
         if executable:exists() then
-          vim.notify(string.format("Setting python path to: %s", executable))
+          -- vim.notify(string.format("Setting python path to: %s", executable))
           M.pyright_set_python_path(client, executable:normalize())
           break
         end
       end
     else
-      vim.notify(string.format("Venv not found for: %s", client.root_dir))
+      -- vim.notify(string.format("Venv not found for: %s", client.root_dir))
     end
   end
 
