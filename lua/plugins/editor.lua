@@ -5,8 +5,9 @@ local plugin_root = require("lazy.core.config").options.root
 return {
 
   {
+    -- a package manager
     "mason-org/mason.nvim",
-    optional = true,
+    -- optional = true,
     opts = {
       -- registries = {
       --   "lua:config.mason_registry",
@@ -16,13 +17,12 @@ return {
         "stylua",
         "shellcheck",
         "shfmt",
-        -- "ruff",
-        -- "pyright",
       },
     },
   },
 
   {
+    -- an undo tree navigator
     "simnalamburt/vim-mundo",
     cond = false,
     init = function()
@@ -35,6 +35,7 @@ return {
   },
 
   {
+    -- an undo tree navigator
     "debugloop/telescope-undo.nvim",
     dependencies = {
       {
@@ -210,8 +211,6 @@ return {
 
   {
     "allaman/emoji.nvim",
-    version = "1.0.0", -- optionally pin to a tag
-    ft = "markdown", -- adjust to your needs
     dependencies = {
       -- util for handling paths
       "nvim-lua/plenary.nvim",
@@ -243,4 +242,14 @@ return {
       },
     },
   },
+
+  {
+    "stevearc/aerial.nvim",
+    opts = {
+      layout = {
+        width = 40,
+      },
+    },
+  },
+
 }

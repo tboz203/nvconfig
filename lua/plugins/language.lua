@@ -1,5 +1,3 @@
--- if true then return {} end
-
 -- if true then
 --   return {
 --     {
@@ -15,28 +13,12 @@
 
 return {
 
-  -- {
-  --   "folke/lazydev.nvim",
-  --   ft = "lua",
-  --   dependencies = {
-  --     {
-  --       "hrsh7th/nvim-cmp",
-  --       opts = function(_, opts)
-  --         opts.sources = opts.sources or {}
-  --         table.insert(opts.sources, { name = "lazydev" })
-  --       end,
-  --     },
-  --   },
-  -- },
-
   {
     "neovim/nvim-lspconfig",
     opts = {
       -- list active formatters when formatting
       format_notify = true,
-      -- servers = {
-      --   cucumber_language_server = {},
-      -- },
+      inlay_hints = { enabled = false },
     },
     init = function()
       -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere
@@ -52,26 +34,26 @@ return {
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
         "bash",
-        -- "cmake",
+        "cmake",
         "dockerfile",
-        -- "git_config",
-        -- "git_rebase",
-        -- "gitattributes",
-        -- "gitcommit",
-        -- "gitignore",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
         "go",
-        -- "ini",
+        "ini",
         "java",
-        -- "jq",
-        -- "lua",
-        -- "make",
+        "jq",
+        "lua",
+        "make",
         "markdown",
         "python",
-        -- "ruby",
-        -- "rust",
+        "ruby",
+        "rust",
         "sql",
-        -- "tsx",
-        -- "typescript",
+        "tsx",
+        "typescript",
         "vim",
       })
     end,
@@ -79,7 +61,7 @@ return {
 
   {
     "stevearc/conform.nvim",
-    opts = function(_, opts)
+    opts = function()
       -- attach some noop editorconfig property handlers, so that Neovim's
       -- editorconfig handling stores those properties in `b:editorconfig`,
       -- so that `shfmt_nvim` can calculate the correct args
@@ -88,19 +70,43 @@ return {
       ec_props.switch_case_indent = function() end
       ec_props.space_redirects = function() end
       ec_props.function_next_line = function() end
+    end,
+  },
 
-      opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
-        python = { "ruff_fix_most", "ruff_format" },
-        sql = { "sql_formatter", "sqlfluff", "pg_format" },
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
         sh = { "shfmt_nvim" },
-      })
+        go = { lsp_format = "prefer" },
+        -- sql = { "pg_format", "sqlfluff" },
+        sql = {},
+      },
 
-      opts.formatters = vim.tbl_extend("force", opts.formatters or {}, {
-        sleek = {
-          command = "sleek",
+      formatters = {
+        sqlfluff = {
+          args = { "fix", "--dialect=postgres", "-" },
+          stdin = true,
+          cwd = require("conform.util").root_file({
+            ".sqlfluff",
+            "flyway.conf",
+            "pep8.ini",
+            "pyproject.toml",
+            "setup.cfg",
+            "tox.ini",
+            ".git",
+          }),
+          require_cwd = false,
+          -- only use this formatter when a `.sqlfluff` file is found
+          condition = function(ctx)
+            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+          end,
         },
-        sql_formatter = {
-          prepend_args = { "-l", "postgresql" },
+        pg_format = {
+          -- only use this formatter when a `.sqlfluff` file is found
+          condition = function(ctx)
+            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+          end,
         },
         shfmt_nvim = {
           -- attempting to use shfmt to enforce in-editor settings
@@ -137,29 +143,8 @@ return {
             return args
           end,
         },
-        ruff_fix_most = {
-          command = "ruff",
-          args = {
-            "check",
-            "--fix",
-            "--force-exclude",
-            "--select=F,E,I",
-            "--ignore=F401",
-            "--exit-zero",
-            "--no-cache",
-            "--stdin-filename",
-            "$FILENAME",
-            "-",
-          },
-          stdin = true,
-          cwd = require("conform.util").root_file({
-            "pyproject.toml",
-            "ruff.toml",
-            ".ruff.toml",
-          }),
-        },
-      })
-    end,
+      },
+    },
   },
 
   -- {
@@ -195,4 +180,46 @@ return {
   --     },
   --   },
   -- },
+
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        gopls = {
+          settings = {
+            gopls = {
+              analyses = {
+                -- Incorrect or missing package comment
+                ST1000 = false,
+                -- Dot imports are discouraged
+                ST1001 = false,
+                -- Poorly chosen identifier
+                ST1003 = false,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters_by_ft = {
+        sql = {},
+      },
+      linters = {
+        sqlfluff = {
+          cmd = "sqlfluff",
+          args = {
+            "lint",
+            "--format=json",
+          },
+        },
+      },
+    },
+  },
+
+  -- { "lark-parser/vim-lark-syntax" },
 }

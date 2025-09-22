@@ -58,3 +58,8 @@ args
 kwargs
 NOTAM
 NOTAMs
+timeframe
+timeframes
+Toolchain
+linter
+linters

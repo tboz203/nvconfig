@@ -24,23 +24,24 @@ vim.o.relativenumber = false
 
 vim.o.history = 1e4
 
-vim.opt.listchars = { tab = ">-", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
-vim.opt.spelloptions:append("camel")
-
----@diagnostic disable-next-line
-local swapdir = vim.fs.joinpath(vim.fn.stdpath("state"), "swap")
-
-vim.fn.mkdir(swapdir, "p")
-vim.opt.directory = { swapdir .. "//", "." }
-
 vim.o.tabstop = 4
 vim.o.shiftwidth = 0
 vim.o.softtabstop = -1
 vim.o.expandtab = true
 vim.o.smartindent = false
+vim.o.breakindent = true
+
+vim.opt.spelloptions:append("camel")
+
+vim.opt.listchars = {
+  tab = ">-",
+  trail = "-",
+  extends = ">",
+  precedes = "<",
+  nbsp = "+",
+}
 
 vim.opt.sessionoptions = {
-  "blank",
   "buffers",
   "curdir",
   "folds",
@@ -52,7 +53,27 @@ vim.opt.sessionoptions = {
   "tabpages",
   "winsize",
 }
+
+-- vim.opt.directory = { "~/.vim/swap//", "." }
+---@diagnostic disable-next-line
+local swapdir = vim.fs.joinpath(vim.fn.stdpath("state"), "swap")
+vim.fn.mkdir(swapdir, "p")
+vim.opt.directory = { swapdir .. "//", "." }
+
 vim.o.shada = "!,'100,s1000"
+vim.opt.sessionoptions = {
+  -- "blank",
+  "buffers",
+  "curdir",
+  "folds",
+  "globals",
+  "help",
+  "localoptions",
+  "options",
+  -- "skiprtp",
+  "tabpages",
+  "winsize",
+}
 
 vim.opt.jumpoptions = { "stack", "view" }
 

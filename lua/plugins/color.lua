@@ -11,4 +11,5 @@ return {
   { "catppuccin/nvim" },
   { "folke/tokyonight.nvim" },
   { "ellisonleao/gruvbox.nvim" },
+  { "romainl/Apprentice" },
 }
