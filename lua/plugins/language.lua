@@ -30,6 +30,19 @@ return {
   -- ensure particular parsers are included by default
   {
     "nvim-treesitter/nvim-treesitter",
+
+    -- getting nvim + treesitter to work in windows was a mess. the approach that finally worked was:
+    --
+    -- 1. putting `tree-sitter` (the cli) onto the path by hand (mason tries to "gunzip" a github release file using
+    --    7z, which appears to use a stored filename rather than simply removing a '.gz' suffix)
+    -- 2. manually invoking `tree-sitter init-config` to make it shut up about its useless missing config
+    -- 3. installing msys2 + gcc, putting the appropriate path (`/c/msys64/ucrt64/`) onto the PATH, and setting
+    --    `CC=gcc.exe CPP=g++.exe` before invoking nvim
+    --
+    -- > `tree-sitter build` seems to REALLY want to use `cl.exe`, but MSVC is a nonstarter for license reasons.
+    -- > i'm pretty confident i've used `zig` somewhere as a replacement, but 1) getting the build to accept it was a
+    -- > trial, and then 2) the resultant libraries seemed to have an ... unrecognized operating system?? idk
+
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
@@ -147,62 +160,6 @@ return {
     },
   },
 
-  -- {
-  --   "neovim/nvim-lspconfig",
-  --   opts = {
-  --     servers = {
-  --       spectral = {
-  --         -- find a spectral ruleset file & tell spectral-language-server about it
-  --         ---@param params lsp.InitializedParams
-  --         ---@param config vim.lsp.ClientConfig
-  --         before_init = function(params, config)
-  --           local util = require("config.util")
-  --           local ruleset_path, item_path
-  --           for _, item in ipairs({ config.root_dir, config.cmd_cwd, "." }) do
-  --             if item ~= nil then
-  --               item_path = util.Path:new(item)
-  --               ruleset_path =
-  --                 item_path:find_any_upwards(".spectral.yaml", ".spectral.yml", ".spectral.json", ".spectral.js")
-  --               if ruleset_path ~= nil then
-  --                 config.settings = config.settings or {}
-  --                 config.settings.rulesetFile = config.settings.rulesetFile or tostring(ruleset_path)
-  --                 vim.notify(
-  --                   string.format("Spectral ruleset file is `%s`", config.settings.rulesetFile),
-  --                   vim.log.levels.INFO
-  --                 )
-  --                 return
-  --               end
-  --             end
-  --           end
-  --           vim.notify("No Spectral ruleset file found", vim.log.levels.INFO)
-  --         end,
-  --       },
-  --     },
-  --   },
-  -- },
-
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        gopls = {
-          settings = {
-            gopls = {
-              analyses = {
-                -- Incorrect or missing package comment
-                ST1000 = false,
-                -- Dot imports are discouraged
-                ST1001 = false,
-                -- Poorly chosen identifier
-                ST1003 = false,
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-
   {
     "mfussenegger/nvim-lint",
     opts = {
@@ -220,6 +177,4 @@ return {
       },
     },
   },
-
-  -- { "lark-parser/vim-lark-syntax" },
 }
