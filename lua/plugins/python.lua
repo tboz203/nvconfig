@@ -55,6 +55,7 @@ return {
     opts = {
       servers = {
         pylsp = {
+          enabled = false,
           autostart = false,
         },
         ruff = {
@@ -92,4 +93,16 @@ return {
       },
     },
   },
+
+  -- {
+  --   "mason-org/mason-lspconfig.nvim",
+  --   opts = {
+  --     automatic_enable = false,
+  --     -- automatic_enable = {
+  --     --   exclude = {
+  --     --     "pylsp",
+  --     --   },
+  --     -- },
+  --   },
+  -- },
 }

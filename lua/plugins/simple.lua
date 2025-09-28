@@ -16,10 +16,10 @@ return {
 
   { "towolf/vim-helm", ft = "helm", cond = "false" },
 
-  { "echasnovski/mini.nvim", cond = false },
-  { "echasnovski/mini.ai", cond = false },
-  { "echasnovski/mini.align", cond = false },
-  { "echasnovski/mini.pairs", cond = false },
-  -- { "echasnovski/mini.surround", cond = false },
-  { "echasnovski/mini.animate", cond = false },
+  -- { "nvim-mini/mini.nvim", cond = false },
+  -- { "nvim-mini/mini.ai", cond = false },
+  -- { "nvim-mini/mini.align", cond = false },
+  -- { "nvim-mini/mini.pairs", cond = false },
+  -- { "nvim-mini/mini.surround", cond = false },
+  -- { "nvim-mini/mini.animate", cond = false },
 }

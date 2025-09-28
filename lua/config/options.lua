@@ -2,20 +2,7 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
--- vim.g.python3_host_prog = vim.fn.expand("~/.pyenv/versions/neovim/bin/python")
--- vim.g.node_host_prog = vim.fn.expand("~/.nodenv/versions/22.13.1/bin/node")
-
--- Set to "solargraph" to use solargraph instead of ruby_lsp.
--- vim.g.lazyvim_ruby_lsp = "ruby_lsp"
--- vim.g.lazyvim_ruby_lsp = "solargraph"
-
 vim.g.snacks_animate = false
-
--- vim.lsp.set_log_level(vim.log.levels.DEBUG)
-
--- vim.o.autowrite = false
--- vim.o.autowriteall = false
--- vim.o.hidden = true
 
 vim.o.linebreak = true
 
