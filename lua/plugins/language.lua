@@ -1,16 +1,3 @@
--- if true then
---   return {
---     {
---       "nvim-treesitter/nvim-treesitter",
---       optional = true,
---       opts = function(_, opts)
---         -- turn this *all* the way off
---         opts.ensure_installed = {}
---       end,
---     },
---   }
--- end
-
 return {
 
   {
@@ -20,19 +7,16 @@ return {
       format_notify = true,
       inlay_hints = { enabled = false },
     },
-    init = function()
-      -- disable the lsp info keybinding provided here; we define our own (conflicting) keybindings elsewhere
-      local keys = require("lazyvim.plugins.lsp.keymaps").get()
-      keys[#keys + 1] = { "<leader>cl", false }
-    end,
+    keys = {
+      { "<leader>cl", false },
+    },
   },
 
   -- ensure particular parsers are included by default
   {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, {
+      opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, {
         "bash",
         "cmake",
         "dockerfile",
@@ -246,4 +230,18 @@ return {
   },
 
   { "lark-parser/vim-lark-syntax" },
+
+  {
+    "nvim-mini/mini.pairs",
+    optional = true,
+    lazy = false,
+    opts = function()
+      vim.api.nvim_create_autocmd("BufRead", {
+        pattern = "*.rs",
+        callback = function()
+          vim.keymap.set("i", "'", "'", { buffer = true })
+        end,
+      })
+    end,
+  },
 }

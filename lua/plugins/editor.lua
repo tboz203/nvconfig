@@ -73,21 +73,6 @@ return {
     end,
   },
 
-  -- {
-  --   "hrsh7th/nvim-cmp",
-  --   optional = true,
-  --   dependencies = {
-  --     "hrsh7th/cmp-emoji",
-  --     "dmitmel/cmp-digraphs",
-  --   },
-  --   opts = function(_, opts)
-  --     vim.list_extend(opts.sources, {
-  --       { name = "emoji" },
-  --       -- { name = "digraphs" },
-  --     })
-  --   end,
-  -- },
-
   {
     "akinsho/bufferline.nvim",
     opts = {
@@ -122,25 +107,17 @@ return {
     dependencies = {
       {
         "neovim/nvim-lspconfig",
-        opts = function()
-          local keys = require("lazyvim.plugins.lsp.keymaps").get()
-          vim.list_extend(keys, {
-            -- from lazyvim/plugins/extras/editor/fzf.lua
-            -- { "gd", "<cmd>FzfLua lsp_definitions     jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
-            -- { "gr", "<cmd>FzfLua lsp_references      jump_to_single_result=true ignore_current_line=true<cr>", desc = "References", nowait = true },
-            -- { "gI", "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Implementation" },
-            -- { "gy", "<cmd>FzfLua lsp_typedefs        jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
-            {
-              "gd",
-              "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>",
-              desc = "Goto Definition",
-              has = "definition",
-            },
-            { "gr", "<cmd>FzfLua lsp_references<cr>", desc = "References", nowait = true },
-            { "gI", "<cmd>FzfLua lsp_implementations<cr>", desc = "Goto Implementation" },
-            { "gy", "<cmd>FzfLua lsp_typedefs<cr>", desc = "Goto T[y]pe Definition" },
-          })
-        end,
+        keys = {
+          {
+            "gd",
+            "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>",
+            desc = "Goto Definition",
+            has = "definition",
+          },
+          { "gr", "<cmd>FzfLua lsp_references<cr>", desc = "References", nowait = true },
+          { "gI", "<cmd>FzfLua lsp_implementations<cr>", desc = "Goto Implementation" },
+          { "gy", "<cmd>FzfLua lsp_typedefs<cr>", desc = "Goto T[y]pe Definition" },
+        },
       },
     },
     keys = function(_, keys)
@@ -172,13 +149,16 @@ return {
       { "<leader>fp", LazyVim.pick("files", { cwd = plugin_root }), desc = "Plugin Files" },
       { "<leader>fu", LazyVim.pick("files", { hidden = true, no_ignore = true, no_ignore_parent = true }), desc = "Unrestricted Files (root dir)" },
       { "<leader>fU", LazyVim.pick("files", { hidden = true, no_ignore = true, no_ignore_parent = true, cwd = nil }), desc = "Unrestricted Files (cwd)" },
+
       --stylua: ignore end
+
       {
-        "gf",
+        "gF",
         function()
-          LazyVim.pick.open("find_files", { search_file = vim.fn.expand("<cfile>") })
+          -- wrapped in a function to evaluate `expand("<cfile>")` at runtime
+          LazyVim.pick.open("files", { pattern = vim.fn.expand("<cfile>") })
         end,
-        desc = "Telescope to file",
+        desc = "Telescope to file under cursor",
         mode = { "n", "v", "o" },
       },
     },
@@ -216,8 +196,6 @@ return {
     dependencies = {
       -- util for handling paths
       "nvim-lua/plenary.nvim",
-      -- optional for nvim-cmp integration
-      "hrsh7th/nvim-cmp",
       -- optional for telescope integration
       "nvim-telescope/telescope.nvim",
       -- optional for fzf-lua integration via vim.ui.select
@@ -227,12 +205,6 @@ return {
       -- default is false, also needed for blink.cmp integration!
       enable_cmp_integration = true,
     },
-    -- config = function(_, opts)
-    --   require("emoji").setup(opts)
-    --   -- optional for telescope integration
-    --   local ts = require('telescope').load_extension 'emoji'
-    --   vim.keymap.set('n', '<leader>se', ts.emoji, { desc = '[S]earch [E]moji' })
-    -- end,
     keys = {
       {
         "<leader>se",
