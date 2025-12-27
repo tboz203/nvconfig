@@ -5,14 +5,8 @@ local plugin_root = require("lazy.core.config").options.root
 return {
 
   {
-    -- a package manager
     "mason-org/mason.nvim",
-    -- optional = true,
     opts = {
-      registries = {
-        -- "lua:config.mason_registry",
-        "github:mason-org/mason-registry",
-      },
       ensure_installed = {
         "stylua",
         "shellcheck",
