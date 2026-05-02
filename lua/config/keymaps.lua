@@ -6,12 +6,13 @@ local util = require("config.util")
 
 -- the basics
 vim.keymap.set({ "!", "o" }, "jk", "<esc>", { remap = true })
-vim.keymap.set({ "!", "o" }, "Jk", "<esc>", { remap = true })
 vim.keymap.set({ "!", "o" }, "jK", "<esc>", { remap = true })
+vim.keymap.set({ "!", "o" }, "Jk", "<esc>", { remap = true })
 vim.keymap.set({ "!", "o" }, "JK", "<esc>", { remap = true })
-vim.keymap.set("n", ";", ":")
 
-vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list characters" })
+vim.keymap.set("", ";", ":")
+
+vim.keymap.set("", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list characters" })
 
 -- the +reformat group
 -- stylua: ignore start
@@ -22,7 +23,7 @@ vim.keymap.set("n", "<leader>rr", "<cmd>retab! | luado return line:gsub('%s+$', 
 -- stylua: ignore end
 
 -- vi-style format command
-vim.keymap.set({ "n", "v" }, "Q", "gq", { desc = "Format text" })
+vim.keymap.set({ "", "v" }, "Q", "gq", { desc = "Format text" })
 
 -- the builtin keymaps 'H' and 'L' for moving the cursor "high" and "low" are
 -- overwritten in LazyVim for switching between buffers. to replace them, we
@@ -32,5 +33,5 @@ vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
 -- toggle diagnostics (for LSP, etc)
-vim.keymap.set("n", "<leader>ud", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
-vim.keymap.set("n", "<leader>uD", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
+vim.keymap.set("", "<leader>ud", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
+vim.keymap.set("", "<leader>uD", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
