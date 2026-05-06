@@ -160,16 +160,6 @@ return {
 
   {
     "nvim-tree/nvim-web-devicons",
-    lazy = true,
-  },
-
-  {
-    -- remove a keymapping group description (overwritten in keymaps.lua)
-    "ThePrimeagen/refactoring.nvim",
-    optional = true,
-    keys = {
-      { "<leader>r", false },
-    },
   },
 
   {
