@@ -14,6 +14,9 @@ vim.keymap.set("n", ";", ":")
 
 vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list characters" })
 
+vim.keymap.set("n", "<c-_>", "gcc", { desc = "Toggle Comment", remap = true })
+vim.keymap.set("v", "<c-_>", "gc", { desc = "Toggle Comment(s)", remap = true })
+
 -- wk.add({
 --   { "<leader>r", nil, desc = "+refactor/reformat" },
 --   { "<leader>rt", "<cmd>retab!<cr>", desc = "Retab buffer" },
@@ -60,11 +63,11 @@ vim.keymap.set(
   --   set buftype=nofile bufhidden=hide filetype=lua
   --   silent norm "aP
   -- ]],
-  function ()
+  function()
     local buf = vim.api.nvim_create_buf(false, true)
-    local stuff = vim.split(vim.inspect(vim.lsp.get_clients()), '\n')
+    local stuff = vim.split(vim.inspect(vim.lsp.get_clients()), "\n")
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, stuff)
-    vim.api.nvim_open_win(buf, true, {split="right"})
+    vim.api.nvim_open_win(buf, true, { split = "right" })
   end,
   { desc = "Inspect LSP state" }
 )
