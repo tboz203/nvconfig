@@ -9,6 +9,8 @@ vim.o.linebreak = true
 vim.o.wrapscan = false
 vim.o.relativenumber = false
 
+vim.env.JAVA_HOME = "/usr/lib/jvm/java-25-amazon-corretto/"
+
 vim.o.history = 1e4
 
 vim.o.tabstop = 4

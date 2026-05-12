@@ -1,20 +1,11 @@
-return {
+-- if true then return {} end
 
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      -- list active formatters when formatting
-      format_notify = true,
-      inlay_hints = { enabled = false },
-    },
-    keys = {
-      { "<leader>cl", false },
-    },
-  },
+return {
 
   -- ensure particular parsers are included by default
   {
     "nvim-treesitter/nvim-treesitter",
+    version = "master",
     opts = function(_, opts)
       opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, {
         "bash",
@@ -131,45 +122,46 @@ return {
     },
   },
 
-  -- {
-  --   "neovim/nvim-lspconfig",
-  --   opts = {
-  --     servers = {
-  --       spectral = {
-  --         -- find a spectral ruleset file & tell spectral-language-server about it
-  --         ---@param params lsp.InitializedParams
-  --         ---@param config vim.lsp.ClientConfig
-  --         before_init = function(params, config)
-  --           local util = require("config.util")
-  --           local ruleset_path, item_path
-  --           for _, item in ipairs({ config.root_dir, config.cmd_cwd, "." }) do
-  --             if item ~= nil then
-  --               item_path = util.Path:new(item)
-  --               ruleset_path =
-  --                 item_path:find_any_upwards(".spectral.yaml", ".spectral.yml", ".spectral.json", ".spectral.js")
-  --               if ruleset_path ~= nil then
-  --                 config.settings = config.settings or {}
-  --                 config.settings.rulesetFile = config.settings.rulesetFile or tostring(ruleset_path)
-  --                 vim.notify(
-  --                   string.format("Spectral ruleset file is `%s`", config.settings.rulesetFile),
-  --                   vim.log.levels.INFO
-  --                 )
-  --                 return
-  --               end
-  --             end
-  --           end
-  --           vim.notify("No Spectral ruleset file found", vim.log.levels.INFO)
-  --         end,
-  --       },
-  --     },
-  --   },
-  -- },
-
   {
     "neovim/nvim-lspconfig",
     opts = {
+      -- list active formatters when formatting
+      format_notify = true,
+      inlay_hints = { enabled = false },
       servers = {
+        -- spectral = {
+        --   -- find a spectral ruleset file & tell spectral-language-server about it
+        --   ---@param params lsp.InitializedParams
+        --   ---@param config vim.lsp.ClientConfig
+        --   before_init = function(params, config)
+        --     local util = require("config.util")
+        --     local ruleset_path, item_path
+        --     for _, item in ipairs({ config.root_dir, config.cmd_cwd, "." }) do
+        --       if item ~= nil then
+        --         item_path = util.Path:new(item)
+        --         ruleset_path =
+        --           item_path:find_any_upwards(".spectral.yaml", ".spectral.yml", ".spectral.json", ".spectral.js")
+        --         if ruleset_path ~= nil then
+        --           config.settings = config.settings or {}
+        --           config.settings.rulesetFile = config.settings.rulesetFile or tostring(ruleset_path)
+        --           vim.notify(
+        --             string.format("Spectral ruleset file is `%s`", config.settings.rulesetFile),
+        --             vim.log.levels.INFO
+        --           )
+        --           return
+        --         end
+        --       end
+        --     end
+        --     vim.notify("No Spectral ruleset file found", vim.log.levels.INFO)
+        --   end,
+        -- },
+        -- terraformls = {
+        --   settings = {
+        --     path = "tofu",
+        --   },
+        -- },
         gopls = {
+          mason = false,
           settings = {
             gopls = {
               analyses = {
@@ -184,10 +176,11 @@ return {
           },
         },
         lemminx = {
-          cmd = {
-            "lemminx",
-            "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
-          },
+          mason = false,
+          -- cmd = {
+          --   "lemminx",
+          --   "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
+          -- },
           -- settings = {
           --   xml = {
           --     server = {
@@ -208,6 +201,9 @@ return {
           -- },
         },
       },
+    },
+    keys = {
+      { "<leader>cl", false },
     },
   },
 
@@ -243,5 +239,56 @@ return {
         end,
       })
     end,
+  },
+
+  {
+    "cappyzawa/telescope-terraform.nvim",
+    optional = true,
+    lazy = true,
+    -- opts = {
+    --   bin = "tofu",
+    -- },
+    opts = function()
+      require("telescope._extensions")._config["terraform"] = {
+        bin = "tofu",
+      }
+    end,
+  },
+
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    lazy = true,
+    opts = {
+      formatters = {
+        terraform_fmt = {
+          command = "tofu",
+        },
+      },
+    },
+  },
+
+  {
+    "mfussenegger/nvim-lint",
+    optional = true,
+    lazy = true,
+    opts = function()
+      local tf_val = require("lint").linters.terraform_validate
+      require("lint").linters.terraform_validate = function()
+        local linter = tf_val()
+        linter.cmd = "tofu"
+        return linter
+      end
+    end,
+  },
+
+  {
+    "nvim-java/nvim-java",
+    lazy = true,
+    ft = { "java", "jproperties" },
+    -- config = function()
+    --   require("java").setup()
+    --   vim.lsp.enable("jdtls")
+    -- end,
   },
 }

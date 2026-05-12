@@ -7,12 +7,13 @@ return {
   {
     -- a package manager
     "mason-org/mason.nvim",
+    lazy = true,
     -- optional = true,
     opts = {
-      registries = {
-        -- "lua:config.mason_registry",
-        "github:mason-org/mason-registry",
-      },
+      -- registries = {
+      --   -- "lua:config.mason_registry",
+      --   "github:mason-org/mason-registry",
+      -- },
       ensure_installed = {
         "stylua",
         "shellcheck",
@@ -25,10 +26,10 @@ return {
     -- an undo tree navigator
     "simnalamburt/vim-mundo",
     cond = false,
+    lazy = true,
     init = function()
       vim.g.mundo_right = 1
     end,
-    lazy = true,
     keys = {
       { "<leader>uu", vim.cmd.MundoToggle, desc = "Toggle Undotree" },
     },
@@ -37,6 +38,7 @@ return {
   {
     -- an undo tree navigator
     "debugloop/telescope-undo.nvim",
+    lazy = true,
     dependencies = {
       {
         "nvim-telescope/telescope.nvim",
@@ -104,6 +106,7 @@ return {
   {
     "ibhagwan/fzf-lua",
     optional = true,
+    lazy = true,
     dependencies = {
       {
         "neovim/nvim-lspconfig",
@@ -130,6 +133,7 @@ return {
 
   {
     "nvim-telescope/telescope.nvim",
+    lazy = false,
     optional = true,
     opts = {
       defaults = {
@@ -173,6 +177,10 @@ return {
     -- remove a keymapping group description (overwritten in keymaps.lua)
     "ThePrimeagen/refactoring.nvim",
     optional = true,
+    lazy = true,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
     keys = {
       { "<leader>r", false },
     },
@@ -191,6 +199,7 @@ return {
 
   {
     "allaman/emoji.nvim",
+    lazy = true,
     -- version = "1.0.0", -- optionally pin to a tag
     -- ft = "markdown", -- adjust to your needs
     dependencies = {
