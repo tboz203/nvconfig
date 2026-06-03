@@ -241,7 +241,7 @@ function M.pyright_on_init(client)
     end
   end
 
-  require("lazyvim.util").lsp.on_attach(M.pyright_on_attach, "pyright")
+  require("snacks").util.lsp.on({ name = "pyright" }, M.pyright_on_attach)
 end
 
 ---@param client vim.lsp.Client
