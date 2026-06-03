@@ -5,7 +5,7 @@ return {
   -- ensure particular parsers are included by default
   {
     "nvim-treesitter/nvim-treesitter",
-    version = "master",
+    -- version = "master",
     opts = function(_, opts)
       opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, {
         "bash",
@@ -265,6 +265,9 @@ return {
           command = "tofu",
         },
       },
+      formatters_by_ft = {
+        hcl = { "terraform_fmt" },
+      },
     },
   },
 
@@ -290,5 +293,12 @@ return {
     --   require("java").setup()
     --   vim.lsp.enable("jdtls")
     -- end,
+  },
+
+  {
+    "gitlab.vim",
+    url = "https://gitlab.com/gitlab-org/editor-extensions/gitlab.vim.git",
+    lazy = true,
+    cond = false,
   },
 }
