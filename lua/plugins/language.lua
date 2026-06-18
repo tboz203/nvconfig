@@ -245,12 +245,14 @@ return {
     "cappyzawa/telescope-terraform.nvim",
     optional = true,
     lazy = true,
-    -- opts = {
-    --   bin = "tofu",
-    -- },
     opts = function()
       require("telescope._extensions")._config["terraform"] = {
-        bin = "tofu",
+          -- stylua: ignore
+        bin = (
+                      vim.env.TG_TF_PATH
+                      or (vim.fn.executable("terraform") and "terraform")
+                      or (vim.fn.executable("tofu") and "tofu")
+                  ),
       }
     end,
   },
@@ -262,7 +264,12 @@ return {
     opts = {
       formatters = {
         terraform_fmt = {
-          command = "tofu",
+          -- stylua: ignore
+          command = (
+                        vim.env.TG_TF_PATH
+                        or (vim.fn.executable("terraform") and "terraform")
+                        or (vim.fn.executable("tofu") and "tofu")
+                    ),
         },
       },
       formatters_by_ft = {
@@ -279,7 +286,12 @@ return {
       local tf_val = require("lint").linters.terraform_validate
       require("lint").linters.terraform_validate = function()
         local linter = tf_val()
-        linter.cmd = "tofu"
+        -- stylua: ignore
+        linter.cmd = (
+                      vim.env.TG_TF_PATH
+                      or (vim.fn.executable("terraform") and "terraform")
+                      or (vim.fn.executable("tofu") and "tofu")
+                  )
         return linter
       end
     end,
