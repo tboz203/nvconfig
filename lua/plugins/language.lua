@@ -155,11 +155,14 @@ return {
         --     vim.notify("No Spectral ruleset file found", vim.log.levels.INFO)
         --   end,
         -- },
-        -- terraformls = {
-        --   settings = {
-        --     path = "tofu",
-        --   },
-        -- },
+        terraformls = {
+          mason = false,
+          settings = {
+            terraform = {
+              path = "tofu",
+            },
+          },
+        },
         gopls = {
           mason = false,
           settings = {
@@ -247,12 +250,12 @@ return {
     lazy = true,
     opts = function()
       require("telescope._extensions")._config["terraform"] = {
-          -- stylua: ignore
+        -- stylua: ignore
         bin = (
-                      vim.env.TG_TF_PATH
-                      or (vim.fn.executable("terraform") and "terraform")
-                      or (vim.fn.executable("tofu") and "tofu")
-                  ),
+          vim.env.TG_TF_PATH
+          or (vim.fn.executable("terraform") and "terraform")
+          or (vim.fn.executable("tofu") and "tofu")
+        ),
       }
     end,
   },
@@ -266,10 +269,10 @@ return {
         terraform_fmt = {
           -- stylua: ignore
           command = (
-                        vim.env.TG_TF_PATH
-                        or (vim.fn.executable("terraform") and "terraform")
-                        or (vim.fn.executable("tofu") and "tofu")
-                    ),
+            vim.env.TG_TF_PATH
+            or (vim.fn.executable("terraform") and "terraform")
+            or (vim.fn.executable("tofu") and "tofu")
+          ),
         },
       },
       formatters_by_ft = {
@@ -288,10 +291,10 @@ return {
         local linter = tf_val()
         -- stylua: ignore
         linter.cmd = (
-                      vim.env.TG_TF_PATH
-                      or (vim.fn.executable("terraform") and "terraform")
-                      or (vim.fn.executable("tofu") and "tofu")
-                  )
+          vim.env.TG_TF_PATH
+          or (vim.fn.executable("terraform") and "terraform")
+          or (vim.fn.executable("tofu") and "tofu")
+        )
         return linter
       end
     end,
@@ -299,7 +302,7 @@ return {
 
   {
     "nvim-java/nvim-java",
-    lazy = true,
+    cond = false,
     ft = { "java", "jproperties" },
     -- config = function()
     --   require("java").setup()
@@ -310,7 +313,6 @@ return {
   {
     "gitlab.vim",
     url = "https://gitlab.com/gitlab-org/editor-extensions/gitlab.vim.git",
-    lazy = true,
     cond = false,
   },
 }
