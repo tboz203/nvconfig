@@ -18,6 +18,10 @@ vim.o.expandtab = true
 vim.o.smartindent = false
 vim.o.breakindent = true
 
+-- find & execute project-local configuration (.nvim.lua)
+-- (unset in project-local config to stop the search)
+vim.o.exrc = true
+
 vim.opt.spelloptions:append("camel")
 
 vim.opt.listchars = {

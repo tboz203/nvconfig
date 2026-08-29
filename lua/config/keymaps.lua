@@ -15,7 +15,7 @@ vim.keymap.set("n", ";", ":")
 vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list characters" })
 
 vim.keymap.set("n", "<c-_>", "gcc", { desc = "Toggle Comment", remap = true })
-vim.keymap.set("v", "<c-_>", "gc", { desc = "Toggle Comment(s)", remap = true })
+vim.keymap.set({ "v", "o" }, "<c-_>", "gc", { desc = "Toggle Comment(s)", remap = true })
 
 -- wk.add({
 --   { "<leader>r", nil, desc = "+refactor/reformat" },
