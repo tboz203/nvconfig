@@ -1,32 +1,6 @@
--- if true then return {} end
-
 local plugin_root = require("lazy.core.config").options.root
 
 return {
-
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "stylua",
-        "shellcheck",
-        "shfmt",
-      },
-    },
-  },
-
-  {
-    -- an undo tree navigator
-    "simnalamburt/vim-mundo",
-    cond = false,
-    init = function()
-      vim.g.mundo_right = 1
-    end,
-    lazy = true,
-    keys = {
-      { "<leader>uu", vim.cmd.MundoToggle, desc = "Toggle Undotree" },
-    },
-  },
 
   {
     -- an undo tree navigator
@@ -60,7 +34,6 @@ return {
     "folke/flash.nvim",
     optional = true,
     lazy = true,
-    -- cond = false,
     keys = function()
       -- heck you, and all your friends too
       return {}
@@ -206,39 +179,6 @@ return {
     opts = {
       layout = {
         width = 40,
-      },
-    },
-  },
-
-  {
-    "olimorris/codecompanion.nvim",
-    cond = false,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "ravitemer/mcphub.nvim",
-    },
-    opts = {
-      strategies = {
-        chat = {
-          adapter = "gemini",
-        },
-        inline = {
-          adapter = "gemini",
-        },
-        cmd = {
-          adapter = "gemini",
-        },
-      },
-      adapters = {
-        gemini = function()
-          return require("codecompanion.adapters").extend("gemini", {
-            env = {
-              -- not quite correct...
-              api_key = "cmd:gcloud auth application-default print-access-token",
-            },
-          })
-        end,
       },
     },
   },

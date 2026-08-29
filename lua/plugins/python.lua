@@ -1,5 +1,3 @@
--- if true then return {} end
-
 local pyutil = require("config.pyutil")
 
 return {
@@ -93,16 +91,4 @@ return {
       },
     },
   },
-
-  -- {
-  --   "mason-org/mason-lspconfig.nvim",
-  --   opts = {
-  --     automatic_enable = false,
-  --     -- automatic_enable = {
-  --     --   exclude = {
-  --     --     "pylsp",
-  --     --   },
-  --     -- },
-  --   },
-  -- },
 }
