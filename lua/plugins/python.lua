@@ -1,9 +1,8 @@
--- if true then return {} end
-
-local pyutil = require("config.pyutil")
+-- if true then
+--   return {}
+-- end
 
 return {
-
   {
     "stevearc/conform.nvim",
     opts = {
@@ -51,58 +50,54 @@ return {
 
   {
     "neovim/nvim-lspconfig",
-    ---@type PluginLspOpts
-    opts = {
-      servers = {
-        pylsp = {
-          enabled = false,
-          autostart = false,
-        },
-        ruff = {
-          init_options = {
-            settings = {
-              lineLength = 119,
-              logLevel = "debug",
-            },
-          },
-          commands = {
-            RuffChangeSetting = {
-              pyutil.ruff_change_setting,
-              desc = "Change a setting for the Ruff language server",
-              nargs = "+",
-            },
-          },
-        },
-        pyright = {
-          on_init = pyutil.pyright_on_init,
-          commands = {
-            PyrightAddExtraPath = {
-              function(path)
-                pyutil.pyright_add_extra_paths(nil, path)
-              end,
-              desc = "Add a directory to Pyright's `sys.path`",
-              nargs = 1,
-              complete = "dir",
-            },
-            PyrightToggleDiagnosticMode = {
-              pyutil.pyright_toggle_diagnostic_mode,
-              desc = "Toggle Pyright's diagnostic mode between 'workspace' and 'openFilesOnly'",
-            },
-          },
-        },
-      },
+    dependencies = {
+      -- nvim-lspconfig does not depend on plenary (afaik),
+      -- but *`config.pyutil`* does!
+      "nvim-lua/plenary.nvim",
     },
+    opts = function(_, opts)
+      local lzutil = require("lazy.core.util")
+      local pyutil = require("config.pyutil")
+      return lzutil.merge(opts, {
+        servers = {
+          pylsp = {
+            enabled = false,
+            autostart = false,
+          },
+          ruff = {
+            init_options = {
+              settings = {
+                lineLength = 119,
+                logLevel = "debug",
+              },
+            },
+            commands = {
+              RuffChangeSetting = {
+                pyutil.ruff_change_setting,
+                desc = "Change a setting for the Ruff language server",
+                nargs = "+",
+              },
+            },
+          },
+          pyright = {
+            on_init = pyutil.pyright_on_init,
+            commands = {
+              PyrightAddExtraPath = {
+                function(path)
+                  pyutil.pyright_add_extra_paths(nil, path)
+                end,
+                desc = "Add a directory to Pyright's `sys.path`",
+                nargs = 1,
+                complete = "dir",
+              },
+              PyrightToggleDiagnosticMode = {
+                pyutil.pyright_toggle_diagnostic_mode,
+                desc = "Toggle Pyright's diagnostic mode between 'workspace' and 'openFilesOnly'",
+              },
+            },
+          },
+        },
+      })
+    end,
   },
-
-  -- {
-  --   "mason-org/mason-lspconfig.nvim",
-  --   opts = {
-  --     automatic_enable = false,
-  --     -- automatic_enable = {
-  --     --   exclude = {
-  --     --     "pylsp",
-  --     --   },
-  --     -- },
-  --   },
-  -- },
 }

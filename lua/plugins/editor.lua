@@ -1,12 +1,18 @@
--- if true then return {} end
+-- if true then
+--   return {}
+-- end
 
 local plugin_root = require("lazy.core.config").options.root
 
 return {
 
   {
-    -- a package manager
-    "mason-org/mason.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = {
+      "mason-org/mason.nvim",
+      "neovim/nvim-lspconfig",
+      "mason-org/mason-lspconfig.nvim",
+    },
     opts = {
       ensure_installed = {
         "stylua",
@@ -136,7 +142,6 @@ return {
       },
     },
   },
-
 
   {
     -- remove a keymapping group description (overwritten in keymaps.lua)
