@@ -3,7 +3,7 @@
 -- Add any additional keymaps here
 
 local util = require("config.util")
-local wk = require("which-key")
+-- local wk = require("which-key")
 
 -- the basics
 vim.keymap.set({ "!", "o" }, "jk", "<esc>", { remap = true })
@@ -16,6 +16,9 @@ vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list ch
 
 vim.keymap.set("n", "<c-_>", "gcc", { desc = "Toggle Comment", remap = true })
 vim.keymap.set({ "v", "o" }, "<c-_>", "gc", { desc = "Toggle Comment(s)", remap = true })
+
+-- let me use visual-block without triggering windows's paste shortcut
+vim.keymap.set("n", "<m-v>", "<c-v>")
 
 -- wk.add({
 --   { "<leader>r", nil, desc = "+refactor/reformat" },
@@ -48,8 +51,8 @@ vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
 -- toggle diagnostics (for LSP, etc)
-vim.keymap.set("n", "<leader>ud", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
-vim.keymap.set("n", "<leader>uD", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
+vim.keymap.set("n", "<leader>ud", util.diagnostics_toggle_buffer, { desc = "Toggle Diagnostics in Buffer" })
+vim.keymap.set("n", "<leader>uD", util.diagnostics_toggle_global, { desc = "Toggle Diagnostics Globally" })
 
 -- LSP debugging
 vim.keymap.set("n", "<leader>cll", "<cmd>LspInfo<cr>", { desc = "LSP Info" })

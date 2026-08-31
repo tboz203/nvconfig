@@ -1,5 +1,12 @@
 -- if true then return {} end
 
+-- stylua: ignore
+local tf_binary = (
+  vim.env.TG_TF_PATH
+  or (vim.fn.executable("tofu") and "tofu")
+  or (vim.fn.executable("terraform") and "terraform")
+)
+
 return {
 
   -- ensure particular parsers are included by default
@@ -159,7 +166,7 @@ return {
           mason = false,
           settings = {
             terraform = {
-              path = "tofu",
+              path = tf_binary,
             },
           },
         },
@@ -250,12 +257,7 @@ return {
     lazy = true,
     opts = function()
       require("telescope._extensions")._config["terraform"] = {
-        -- stylua: ignore
-        bin = (
-          vim.env.TG_TF_PATH
-          or (vim.fn.executable("terraform") and "terraform")
-          or (vim.fn.executable("tofu") and "tofu")
-        ),
+        bin = tf_binary,
       }
     end,
   },
@@ -267,12 +269,7 @@ return {
     opts = {
       formatters = {
         terraform_fmt = {
-          -- stylua: ignore
-          command = (
-            vim.env.TG_TF_PATH
-            or (vim.fn.executable("terraform") and "terraform")
-            or (vim.fn.executable("tofu") and "tofu")
-          ),
+          command = tf_binary,
         },
       },
       formatters_by_ft = {
@@ -289,12 +286,7 @@ return {
       local tf_val = require("lint").linters.terraform_validate
       require("lint").linters.terraform_validate = function()
         local linter = tf_val()
-        -- stylua: ignore
-        linter.cmd = (
-          vim.env.TG_TF_PATH
-          or (vim.fn.executable("terraform") and "terraform")
-          or (vim.fn.executable("tofu") and "tofu")
-        )
+        linter.cmd = tf_binary
         return linter
       end
     end,

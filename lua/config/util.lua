@@ -1,95 +1,122 @@
----@class LazyUtilCore
--- local M = require("lazy.core.util")
 local M = {}
 
--- toggling diagnostics (for LSP, etc)
-M.diagnostic_state = { [-1] = true }
-
-function M.toggle_current_buffer_diagnostics()
-  -- find our current state
-  local buf_id = vim.api.nvim_get_current_buf()
-  local buf_state = M.diagnostic_state[buf_id]
-  local global_state = M.diagnostic_state[-1]
-
-  -- if we match global state (explicit or otherwise) then
-  if buf_state == nil or buf_state == global_state then
-    -- set to !global_state
-    if global_state then
-      M.diagnostic_state[buf_id] = false
-      vim.notify("Disabling diagnostics in buffer")
-      vim.diagnostic.enable(false, { bufnr = buf_id })
-    else
-      M.diagnostic_state[buf_id] = true
-      vim.notify("Enabling diagnostics in buffer")
-      vim.diagnostic.enable(true, { bufnr = buf_id })
-    end
-  else
-    -- otherwise clear buffer state & match global
-    M.diagnostic_state[buf_id] = nil
-    if global_state then
-      vim.notify("Clearing diagnostics toggle (enabled globally)")
-      vim.diagnostic.enable(true, { bufnr = buf_id })
-    else
-      vim.notify("Clearing diagnostics toggle (disabled globally)")
-      vim.diagnostic.enable(false, { bufnr = buf_id })
-    end
+--- Get a concrete buffer number
+--- @param bufnr integer? An optional buffer number. `nil` and `0` are coerced to the current buffer.
+--- @return integer bufnr A buffer number.
+function M.buffer_number(bufnr)
+  if bufnr == nil or bufnr < 1 then
+    bufnr = vim.api.nvim_get_current_buf()
   end
+  return bufnr
 end
 
-function M.toggle_global_diagnostics()
+-- Toggling diagnostics (for LSP, etc)
+-- ===================================
+
+--- @type table<integer, boolean> enablement per buffer; index -1 represents "global" enablement
+M.diagnostic_state = { [-1] = true }
+-- I am aware of `vim.diagnostic.is_enabled`, but I want to differentiate between "enabled", "disabled", and "unset"
+
+--- toggle displaying inline diagnostics in a buffer
+--- @param bufnr integer? a buffer number. `nil` and `0` indicate the current buffer.
+--- @param enable boolean? explicitly enable or disable diagnostics. toggles when param is `nil`.
+function M.diagnostics_toggle_buffer(bufnr, enable)
+  bufnr = M.buffer_number(bufnr)
+
+  if enable == nil then
+    -- find our current state
+    local buf_state = M.diagnostic_state[bufnr]
+    local global_state = M.diagnostic_state[-1]
+
+    -- if we started in an explicit state that differs from the global state, then reset to global
+    if buf_state ~= nil and buf_state ~= global_state then
+      M.diagnostics_reset_buffer(bufnr)
+      return
+    end
+
+    -- otherwise, set the buffer to the inverse of global
+    enable = not global_state
+  end
+
+  if enable then
+    vim.notify("Enabling diagnostics in buffer")
+  else
+    vim.notify("Disabling diagnostics in buffer")
+  end
+
+  M.diagnostic_state[bufnr] = enable
+  vim.diagnostic.enable(enable, { bufnr = bufnr })
+end
+
+--- Reset buffer's inline diagnostics display state to the global value.
+--- @param bufnr integer the buffer to reset. `nil` and `0` indicate the current buffer.
+function M.diagnostics_reset_buffer(bufnr)
+  bufnr = M.buffer_number(bufnr)
+  -- clear buffer state & match global
+  local global_state = M.diagnostic_state[-1]
+  if global_state then
+    vim.notify("Clearing diagnostics toggle (enabled globally)")
+  else
+    vim.notify("Clearing diagnostics toggle (disabled globally)")
+  end
+  M.diagnostic_state[bufnr] = nil
+  vim.diagnostic.enable(global_state, { bufnr = bufnr })
+end
+
+--- Toggle displaying inline diagnostics' global value.
+--- Buffers that have not otherwise been enabled or disabled will use the
+--- global value.
+--- @param enable boolean? explicitly enable or disable. toggle when `nil`.
+function M.diagnostics_toggle_global(enable)
   -- fetch, toggle, and store global state
-  local global_state = not M.diagnostic_state[-1]
-  M.diagnostic_state[-1] = global_state
+  if enable == nil then
+    enable = not M.diagnostic_state[-1]
+  end
+  M.diagnostic_state[-1] = enable
 
   -- give notice
-  if global_state then
+  if enable then
     vim.notify("Enabling diagnostics globally")
   else
     vim.notify("Disabling diagnostics globally")
   end
 
   -- for each buffer
-  for _, buf_id in ipairs(vim.api.nvim_list_bufs()) do
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     -- if it does not have an explicit diagnostic state:
-    if M.diagnostic_state[buf_id] == nil then
+    if M.diagnostic_state[bufnr] == nil then
       -- set appropriate diagnostic state
-      if global_state then
-        vim.diagnostic.enable(true, { bufnr = buf_id })
-      else
-        vim.diagnostic.enable(false, { bufnr = buf_id })
-      end
+      vim.diagnostic.enable(enable, { bufnr = bufnr })
     end
   end
 end
 
--- enable or disable diagnostics in the current buffer based on our state
-function M.update_current_buffer_diagnostics()
+--- Apply
+--- @param bufnr integer? buffer number. `nil` and `0` indicate the current buffer.
+function M.update_buffer_diagnostics(bufnr)
   -- find our current state
-  local buf_id = vim.api.nvim_get_current_buf()
-  local buf_state = M.diagnostic_state[buf_id]
+  bufnr = M.buffer_number(bufnr)
+  local buf_state = M.diagnostic_state[bufnr]
   local global_state = M.diagnostic_state[-1]
 
-  if buf_state or (buf_state == nil and global_state) then
-    vim.diagnostic.enable(true, { bufnr = buf_id })
-  else
-    vim.diagnostic.enable(false, { bufnr = buf_id })
-  end
+  vim.diagnostic.enable(buf_state or (buf_state == nil and global_state), { bufnr = bufnr })
 end
 
---- Combine unique arrays. Mutates and returns the first argument.
---- To create a new unique array, pass an empty array first.
----@generic T
----@param first T[]
----@param ... T[]
----@return T[] set
+--- Combine two or more sets (arrays with unique members).
+--- Mutates and returns the first argument. To create a new unique array, pass
+--- an empty array first.
+--- @generic T
+--- @param first T[]
+--- @param ... T[]
+--- @return T[] result the resulting set
 function M.set_add(first, ...)
-  ---@alias T T
+  --- @alias T T
   local rest = { ... }
 
   -- special case: adding a single item
   if #rest == 1 then
     local _, other = next(rest)
-    if #other == 1 then
+    if other and #other == 1 then
       local _, right_elem = next(other)
       for _, item in ipairs(first) do
         if item == right_elem then
@@ -101,15 +128,13 @@ function M.set_add(first, ...)
     end
   end
 
-  ---@type table<T, true>
-  --- the set of elements in the first list
+  --- @type table<T, true> the set of elements in the first list
   local element_set = {}
   for _, elem in ipairs(first) do
     element_set[elem] = true
   end
 
-  ---@type table<T, true>
-  --- the set of elements to be added to the first list
+  --- @type table<T, true> the set of elements to be added to the first list
   local additions = {}
   for _, other in ipairs(rest) do
     for _, elem in ipairs(other) do
@@ -126,11 +151,10 @@ function M.set_add(first, ...)
   return first
 end
 
--- get or create a nested table, following the given chain of lookup keys
--- note: this mutates `tbl`
----@param tbl table
----@param ... string
----@return table tbl
+--- get or create a nested table, following the given chain of lookup keys. mutates `tbl`
+--- @param tbl table
+--- @param ... string | integer
+--- @return table tbl
 function M.deepen(tbl, ...)
   local keys = { ... }
   local curr = tbl
@@ -148,11 +172,11 @@ end
 
 -- add a workspace folder to a specific LSP client. If a matching workspace
 -- folder already exists, silently do nothing
----@param client vim.lsp.Client
----@param folder string
----@return nil
+--- @param client vim.lsp.Client
+--- @param folder string
+--- @return nil
 function M.lsp_client_add_workspace_folder(client, folder)
-  ---@type lsp.WorkspaceFolder[]
+  --- @type lsp.WorkspaceFolder[]
   local client_ws_folders = client.workspace_folders or {}
   for _, ws_folder in ipairs(client_ws_folders) do
     if folder == ws_folder.name then
@@ -160,20 +184,20 @@ function M.lsp_client_add_workspace_folder(client, folder)
     end
   end
 
-  ---@type lsp.WorkspaceFolder
+  --- @type lsp.WorkspaceFolder
   local new_workspace_folder = {
     uri = vim.uri_from_fname(folder),
     name = folder,
   }
 
-  client.notify("workspace/didChangeWorkspaceFolders", {
+  client:notify("workspace/didChangeWorkspaceFolders", {
     event = {
       added = { new_workspace_folder },
       removed = {},
     },
   })
 
-  ---@type lsp.WorkspaceFolder[]
+  --- @type lsp.WorkspaceFolder[]
   client.workspace_folders = vim.list_extend(client.workspace_folders or {}, { new_workspace_folder })
 end
 
@@ -219,6 +243,59 @@ function M.fix_shell_settings()
     -- vim.notify("Changing shellcmdflag to `/s /c`")
     vim.o.shellcmdflag = "/s /c"
   end
+end
+
+-- Toggling Treesitter Highlighting
+-- ================================
+
+--- @type table<integer, boolean> enablement per buffer; index -1 represents "global" enablement
+M.treesitter_state = { [-1] = true }
+
+--- toggle treesitter highlighting in a buffer
+--- @param enable boolean? explicitly enable or disable treesitter. toggle when `nil`.
+--- @param bufnr integer? buffer number. defaults to current buffer
+function M.treesitter_toggle_buffer(enable, bufnr)
+  bufnr = M.buffer_number(bufnr)
+
+  if enable == nil then
+    local buf_state = M.treesitter_state[bufnr]
+    local global_state = M.treesitter_state[-1]
+
+    -- if we started in an explicit state that differs from the global state, then reset to global
+    if buf_state ~= nil and buf_state ~= global_state then
+      M.treesitter_reset_buffer(bufnr)
+      return
+    end
+
+    -- otherwise, set the buffer to the inverse of global
+    enable = not global_state
+  end
+
+  if enable then
+    vim.notify("Enabling treesitter highlighting in buffer")
+    vim.treesitter.start(bufnr)
+    vim.treesitter.query.lint(bufnr)
+  else
+    vim.notify("Disabling treesitter highlighting in buffer")
+    vim.treesitter.stop(bufnr)
+    vim.treesitter.query.lint(bufnr, { clear = true })
+  end
+
+  M.treesitter_state[bufnr] = enable
+end
+
+function M.treesitter_reset_buffer(bufnr)
+  error("Not Implemented :(")
+
+  bufnr = M.buffer_number(bufnr)
+  local global_state = M.treesitter_state[-1]
+  if global_state then
+    vim.notify("Clearing treesitter toggle (enabled globally)")
+  else
+    vim.notify("Clearing treesitter toggle (disabled globally)")
+  end
+  M.diagnostic_state[bufnr] = nil
+  vim.diagnostic.enable(global_state, { bufnr = bufnr })
 end
 
 return M
