@@ -73,3 +73,5 @@ vim.opt.diffopt:append({ "iwhiteall", "vertical", "closeoff", "hiddenoff", "algo
 -- Enable this option to require a Prettier config file
 -- If no prettier config file is found, the formatter will not be used
 vim.g.lazyvim_prettier_needs_config = false
+
+vim.uv.os_setenv("JAVA_HOME", "/opt/amazon-corretto-21.0.8.9.1-linux-x64")

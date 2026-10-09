@@ -204,21 +204,22 @@ return {
           },
         },
         jdtls = {
-          -- settings = {
-          --   java = {
-          --     format = {
-          --       settings = {
-          --         url = vim.fn.stdpath("config") .. "/data/eclipse-java-google-style.xml",
-          --       },
-          --     },
-          --   },
-          -- },
+          root_markers = { ".git", "mvnw", "gradlew", ".classpath" },
         },
       },
     },
-    -- keys = {
-    --   { "<leader>cl", false },
-    -- },
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    -- when lspconfig is loaded, create a user command to view LSP logs
+    opts = function()
+      vim.api.nvim_create_user_command("LspLogs", function()
+        vim.cmd.edit(vim.fn.stdpath("state") .. "/lsp.log")
+        vim.opt_local.buftype = "nowrite"
+        vim.opt_local.swapfile = false
+      end, { desc = "View LSP Logs" })
+    end,
   },
 
   {
@@ -230,10 +231,7 @@ return {
       linters = {
         sqlfluff = {
           cmd = "sqlfluff",
-          args = {
-            "lint",
-            "--format=json",
-          },
+          args = { "lint", "--format=json" },
         },
       },
     },
