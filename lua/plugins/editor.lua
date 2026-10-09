@@ -7,110 +7,85 @@ local plugin_root = require("lazy.core.config").options.root
 return {
 
   {
+    -- mason automation layer
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = {
+      -- a package manager
       "mason-org/mason.nvim",
+      -- language server configuration system
       "neovim/nvim-lspconfig",
+      -- mason + lspconfig integration layer - install language servers automatically
       "mason-org/mason-lspconfig.nvim",
     },
     opts = {
+      run_on_start = true,
+      auto_update = true,
+      -- start_delay = 1000, -- 1 second
+      debounce_hours = 12,
       ensure_installed = {
         "stylua",
         "shellcheck",
         "shfmt",
+        "google-java-format",
+        "pgformatter",
       },
+    },
+  },
+
+  {
+    "stevearc/conform.nvim",
+    lazy = true,
+    cmd = { "Conform" },
+    opts = function()
+      ---@param args vim.api.keyset.create_user_command.command_args
+      local conform = function(args)
+        local formatters = nil
+        if not vim.tbl_isempty(args.fargs) then
+          formatters = args.fargs
+        end
+
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+
+        require("conform").format({ async = true, formatters = formatters, range = range })
+      end
+
+      local conform_complete = function()
+        local formatters = {}
+        for _, forminfo in pairs(require("conform").list_all_formatters()) do
+          if forminfo.available then
+            formatters[#formatters + 1] = forminfo.name
+          end
+        end
+        return formatters
+      end
+
+      vim.api.nvim_create_user_command(
+        "Conform",
+        conform,
+        { desc = "Format with Conform", range = true, complete = conform_complete, nargs = "*" }
+      )
+    end,
+  },
+
+  {
+    -- mason + conform integration layer - install formatters automatically
+    -- (attempts to map conform formatter names to mason packges; not 100% reliable)
+    "zapling/mason-conform.nvim",
+    dependencies = {
+      "mason-org/mason.nvim",
+      "stevearc/conform.nvim",
     },
   },
 
   {
     -- a "picker" system
-    "nvim-telescope/telescope.nvim",
-    dependencies = {
-      -- an undo tree navigator
-      "debugloop/telescope-undo.nvim",
-    },
-    keys = {
-      { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
-    },
-    opts = {
-      extensions = {
-        undo = {
-          side_by_side = true,
-          layout_config = {
-            preview_width = 0.75,
-          },
-        },
-      },
-    },
-    config = function(_, opts)
-      require("telescope").setup(opts)
-      require("telescope").load_extension("undo")
-    end,
-  },
-
-  {
-    "folke/flash.nvim",
-    optional = true,
-    lazy = true,
-    -- cond = false,
-    keys = function()
-      -- heck you, and all your friends too
-      return {}
-    end,
-  },
-
-  {
-    "akinsho/bufferline.nvim",
-    opts = {
-      options = {
-        always_show_bufferline = true,
-      },
-    },
-    keys = {
-      { "<leader>bb", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
-      { "<leader>bx", "<cmd>BufferLinePickClose<cr>", desc = "Close buffer with pick" },
-      { "<leader>bh", "<cmd>BufferLineMovePrev<cr>", desc = "Move Buffer Left" },
-      { "<leader>bl", "<cmd>BufferLineMoveNext<cr>", desc = "Move Buffer Right" },
-      { "<leader>bs", "<cmd>BufferLineSortByDirectory<cr>", desc = "Sort Buffers by Directory" },
-      -- LazyVim defined `bl` and `br` to delete buffers left and right
-      -- respectively; we're overriding one of those, and clearing the other
-      { "<leader>br" },
-    },
-  },
-
-  {
-    "nvim-lualine/lualine.nvim",
-    event = "VeryLazy",
-    opts = function(_, opts)
-      local util = require("lazyvim.util.lualine")
-      table.remove(opts.sections.lualine_c, 4)
-      table.insert(opts.sections.lualine_c, 4, util.pretty_path({ length = 0 }))
-    end,
-  },
-
-  {
-    "ibhagwan/fzf-lua",
-    optional = true,
-    lazy = true,
-    dependencies = {
-      "neovim/nvim-lspconfig",
-    },
-    keys = {
-      {
-        "gd",
-        "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>",
-        desc = "Goto Definition",
-        has = "definition",
-      },
-      { "gr", "<cmd>FzfLua lsp_references<cr>", desc = "References", nowait = true },
-      { "gI", "<cmd>FzfLua lsp_implementations<cr>", desc = "Goto Implementation" },
-      { "gy", "<cmd>FzfLua lsp_typedefs<cr>", desc = "Goto T[y]pe Definition" },
-      { "<leader>sp", LazyVim.pick("live_grep", { cwd = plugin_root }), desc = "Plugin Files" },
-      { "<leader>fp", LazyVim.pick("files", { cwd = plugin_root }), desc = "Plugin Files" },
-    },
-  },
-
-  {
     "nvim-telescope/telescope.nvim",
     opts = {
       defaults = {
@@ -140,6 +115,97 @@ return {
         end,
         desc = "Telescope to file under cursor",
       },
+    },
+  },
+
+  {
+    -- an undo tree navigator
+    "debugloop/telescope-undo.nvim",
+    dependencies = {
+      {
+        "nvim-telescope/telescope.nvim",
+        keys = {
+          { "<leader>uu", "<cmd>Telescope undo<cr>", desc = "Telescope undo" },
+        },
+        opts = {
+          extensions = {
+            undo = {
+              side_by_side = true,
+              layout_config = {
+                preview_width = 0.75,
+              },
+            },
+          },
+        },
+        config = function(_, opts)
+          require("telescope").setup(opts)
+          require("telescope").load_extension("undo")
+        end,
+      },
+    },
+  },
+
+  {
+    "folke/flash.nvim",
+    optional = true,
+    lazy = true,
+    -- cond = false,
+    keys = function()
+      -- heck you, and all your friends too
+      return {}
+    end,
+  },
+
+  {
+    -- list open buffers at the top of the window
+    "akinsho/bufferline.nvim",
+    opts = {
+      options = {
+        always_show_bufferline = true,
+      },
+    },
+    keys = {
+      { "<leader>bb", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
+      { "<leader>bx", "<cmd>BufferLinePickClose<cr>", desc = "Close buffer with pick" },
+      { "<leader>bh", "<cmd>BufferLineMovePrev<cr>", desc = "Move Buffer Left" },
+      { "<leader>bl", "<cmd>BufferLineMoveNext<cr>", desc = "Move Buffer Right" },
+      { "<leader>bs", "<cmd>BufferLineSortByDirectory<cr>", desc = "Sort Buffers by Directory" },
+      -- LazyVim defined `bl` and `br` to delete buffers left and right
+      -- respectively; we're overriding one of those, and clearing the other
+      { "<leader>br" },
+    },
+  },
+
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    opts = function(_, opts)
+      local util = require("lazyvim.util.lualine")
+      table.remove(opts.sections.lualine_c, 4)
+      table.insert(opts.sections.lualine_c, 4, util.pretty_path({ length = 0 }))
+    end,
+  },
+
+  {
+    -- fuzzy finder
+    "ibhagwan/fzf-lua",
+    optional = true,
+    lazy = true,
+    dependencies = {
+      "neovim/nvim-lspconfig",
+    },
+    keys = {
+      {
+        "gd",
+        "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>",
+        desc = "Goto Definition",
+        has = "definition",
+      },
+      { "gr", "<cmd>FzfLua lsp_references<cr>", desc = "References", nowait = true },
+      { "gI", "<cmd>FzfLua lsp_implementations<cr>", desc = "Goto Implementation" },
+      { "gy", "<cmd>FzfLua lsp_typedefs<cr>", desc = "Goto T[y]pe Definition" },
+      { "<leader>sp", LazyVim.pick("live_grep", { cwd = plugin_root }), desc = "Plugin Files" },
+      { "<leader>fp", LazyVim.pick("files", { cwd = plugin_root }), desc = "Plugin Files" },
     },
   },
 
@@ -276,27 +342,30 @@ return {
       local enabled = {}
 
       Renderer._enable_for_buffer = Renderer.enable_for_buffer
-      Renderer.enable_for_buffer = function(bufnr, ...)
+      Renderer.enable_for_buffer = function(bufnr, ...) ---@diagnostic disable-line: duplicate-set-field
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         enabled[bufnr] = true
         Renderer._enable_for_buffer(bufnr, ...)
       end
 
       Renderer._disable_for_buffer = Renderer.disable_for_buffer
-      Renderer.disable_for_buffer = function(bufnr, ...)
+      Renderer.disable_for_buffer = function(bufnr, ...) ---@diagnostic disable-line: duplicate-set-field
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         enabled[bufnr] = false
         Renderer._disable_for_buffer(bufnr, ...)
       end
 
-      Ansi.toggle = function(bufnr, ...)
+      Ansi.toggle = function(bufnr) ---@diagnostic disable-line: duplicate-set-field
         bufnr = bufnr or vim.api.nvim_get_current_buf()
         if enabled[bufnr] then
-          Ansi.disable(bufnr, ...)
+          Ansi.disable(bufnr)
         else
-          Ansi.enable(bufnr, ...)
+          Ansi.enable(bufnr)
         end
       end
     end,
   },
+
+  -- handle cli arguments like `filename:lineno`
+  "bogado/file-line",
 }

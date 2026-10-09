@@ -3,7 +3,6 @@
 -- Add any additional keymaps here
 
 local util = require("config.util")
-local wk = require("which-key")
 
 -- the basics
 vim.keymap.set({ "!", "o" }, "jk", "<esc>", { remap = true })
@@ -48,25 +47,20 @@ vim.keymap.set("", "zZ", "M", { desc = "Move cursor center" })
 vim.keymap.set("", "zB", "L", { desc = "Move cursor 'Bottom'" })
 
 -- toggle diagnostics (for LSP, etc)
-vim.keymap.set("n", "<leader>ud", util.toggle_current_buffer_diagnostics, { desc = "Toggle Diagnostics in Buffer" })
-vim.keymap.set("n", "<leader>uD", util.toggle_global_diagnostics, { desc = "Toggle Diagnostics Globally" })
+vim.keymap.set("n", "<leader>ud", util.toggle_diagnostics_in_buffer, { desc = "Toggle Diagnostics in Buffer" })
+vim.keymap.set("n", "<leader>uD", util.toggle_diagnostics_globally, { desc = "Toggle Diagnostics Globally" })
 
 -- LSP debugging
-vim.keymap.set("n", "<leader>cll", "<cmd>LspInfo<cr>", { desc = "LSP Info" })
-vim.keymap.set("n", "<leader>clL", "<cmd>LspLog<cr>", { desc = "LSP Log output" })
+-- vim.keymap.set("n", "<leader>cll", "<cmd>LspInfo<cr>", { desc = "LSP Info" })
+-- vim.keymap.set("n", "<leader>clL", "<cmd>LspLog<cr>", { desc = "LSP Log output" })
 vim.keymap.set(
   "n",
   "<leader>cli",
-  -- [[
-  --   let @a = execute("lua =vim.lsp.get_active_clients()")
-  --   noswapfile enew
-  --   set buftype=nofile bufhidden=hide filetype=lua
-  --   silent norm "aP
-  -- ]],
+  --- grab LSP client details & paste them into a scratch buffer
   function()
     local buf = vim.api.nvim_create_buf(false, true)
-    local stuff = vim.split(vim.inspect(vim.lsp.get_clients()), "\n")
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, stuff)
+    local details = vim.split(vim.inspect(vim.lsp.get_clients()), "\n")
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, details)
     vim.api.nvim_open_win(buf, true, { split = "right" })
   end,
   { desc = "Inspect LSP state" }

@@ -5,9 +5,11 @@ local M = {}
 -- toggling diagnostics (for LSP, etc)
 M.diagnostic_state = { [-1] = true }
 
-function M.toggle_current_buffer_diagnostics()
+--- Toggle displaying inline diagnostic markup in a buffer
+---@param buf_id integer | nil - A buffer id, or nil to indicate the current buffer
+function M.toggle_diagnostics_in_buffer(buf_id)
+  buf_id = buf_id or vim.api.nvim_get_current_buf()
   -- find our current state
-  local buf_id = vim.api.nvim_get_current_buf()
   local buf_state = M.diagnostic_state[buf_id]
   local global_state = M.diagnostic_state[-1]
 
@@ -36,7 +38,8 @@ function M.toggle_current_buffer_diagnostics()
   end
 end
 
-function M.toggle_global_diagnostics()
+--- Toggle displaying inline diagnostic markup in all current & future buffers
+function M.toggle_diagnostics_globally()
   -- fetch, toggle, and store global state
   local global_state = not M.diagnostic_state[-1]
   M.diagnostic_state[-1] = global_state

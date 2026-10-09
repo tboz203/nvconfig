@@ -2,6 +2,15 @@
 --   return {}
 -- end
 
+-- attach some noop editorconfig property handlers, so that Neovim's
+-- editorconfig handling stores those properties in `b:editorconfig`,
+-- so that `shfmt-nvim` can calculate the correct args
+local ec_props = require("editorconfig").properties
+ec_props.binary_next_line = function() end
+ec_props.switch_case_indent = function() end
+ec_props.space_redirects = function() end
+ec_props.function_next_line = function() end
+
 return {
 
   -- ensure particular parsers are included by default
@@ -37,31 +46,20 @@ return {
 
   {
     "stevearc/conform.nvim",
-    opts = function()
-      -- attach some noop editorconfig property handlers, so that Neovim's
-      -- editorconfig handling stores those properties in `b:editorconfig`,
-      -- so that `shfmt_nvim` can calculate the correct args
-      local ec_props = require("editorconfig").properties
-      ec_props.binary_next_line = function() end
-      ec_props.switch_case_indent = function() end
-      ec_props.space_redirects = function() end
-      ec_props.function_next_line = function() end
-    end,
-  },
-
-  {
-    "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
-        sh = { "shfmt_nvim" },
+        sh = { "shfmt-nvim" },
         go = { lsp_format = "prefer" },
         -- sql = { "pg_format", "sqlfluff" },
-        sql = {},
+        -- sql = {},
+        sql = { "pg_format" },
+        java = { "google-java-format" },
+        javascript = { "prettier" },
       },
 
       formatters = {
         sqlfluff = {
-          args = { "fix", "--dialect=postgres", "-" },
+          args = { "format", "-", "--stdin-filename", "$FILENAME" },
           stdin = true,
           cwd = require("conform.util").root_file({
             ".sqlfluff",
@@ -78,13 +76,23 @@ return {
             return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
           end,
         },
-        pg_format = {
-          -- only use this formatter when a `.sqlfluff` file is found
-          condition = function(ctx)
-            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
-          end,
+        ["sqlfluff-ansi"] = {
+          inherit = "sqlfluff",
+          append_args = { "--dialect=ansi" },
+          condition = nil,
         },
-        shfmt_nvim = {
+        ["sqlfluff-postgres"] = {
+          inherit = "sqlfluff",
+          append_args = { "--dialect=postgres" },
+          condition = nil,
+        },
+        -- pg_format = {
+        --   -- only use this formatter when a `.sqlfluff` file is found
+        --   condition = function(ctx)
+        --     return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+        --   end,
+        -- },
+        ["shfmt-nvim"] = {
           -- attempting to use shfmt to enforce in-editor settings
           command = "shfmt",
           args = function(_, ctx)
@@ -119,6 +127,26 @@ return {
             return args
           end,
         },
+        prettier = {
+          ft_parsers = {
+            javascript = "babel",
+            javascriptreact = "babel",
+            typescript = "typescript",
+            typescriptreact = "typescript",
+            vue = "vue",
+            css = "css",
+            scss = "scss",
+            less = "less",
+            html = "html",
+            json = "json",
+            jsonc = "json",
+            yaml = "yaml",
+            markdown = "markdown",
+            ["markdown.mdx"] = "mdx",
+            graphql = "graphql",
+            handlebars = "glimmer",
+          },
+        },
       },
     },
   },
@@ -131,7 +159,7 @@ return {
       inlay_hints = { enabled = false },
       servers = {
         terraformls = {
-          mason = false,
+          mason = false, -- not natively understood by lspconfig; picked up by mason-lspconfig
           settings = {
             terraform = {
               path = "tofu",
@@ -143,11 +171,11 @@ return {
           settings = {
             gopls = {
               analyses = {
-                -- Incorrect or missing package comment
+                -- "Incorrect or missing package comment"
                 ST1000 = false,
-                -- Dot imports are discouraged
+                -- "Dot imports are discouraged"
                 ST1001 = false,
-                -- Poorly chosen identifier
+                -- "Poorly chosen identifier"
                 ST1003 = false,
               },
             },
@@ -155,34 +183,42 @@ return {
         },
         lemminx = {
           mason = false,
-          -- cmd = {
-          --   "lemminx",
-          --   "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
-          -- },
+          cmd = { "lemminx", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" },
+          settings = {
+            xml = {
+              format = {
+                -- enabled = true,
+                -- splitAttributes = false,
+                -- joinCDATALines = false,
+                -- joinCommentLines = false,
+                -- formatComments = true,
+                -- joinContentLines = false,
+                -- spaceBeforeEmptyCloseTag = true,
+              },
+              validation = {
+                -- noGrammar = "hint",
+                -- enabled = true,
+                -- schema = true,
+              },
+            },
+          },
+        },
+        jdtls = {
           -- settings = {
-          --   xml = {
-          --     server = {
-          --       vmargs = {
-          --         "-Djavax.net.ssl.trustStore=/home/linuxbrew/.linuxbrew/Cellar/openjdk/24.0.2/libexec/lib/security/cacerts",
+          --   java = {
+          --     format = {
+          --       settings = {
+          --         url = vim.fn.stdpath("config") .. "/data/eclipse-java-google-style.xml",
           --       },
           --     },
-          --     -- format = {
-          --     --   -- enabled = false,
-          --     --   -- splitAttributes = true,
-          --     --   -- joinCDATALines = false,
-          --     --   -- joinCommentLines = false,
-          --     --   -- formatComments = false,
-          --     --   -- joinContentLines = false,
-          --     --   -- spaceBeforeEmptyCloseTag = false,
-          --     -- },
           --   },
           -- },
         },
       },
     },
-    keys = {
-      { "<leader>cl", false },
-    },
+    -- keys = {
+    --   { "<leader>cl", false },
+    -- },
   },
 
   {
