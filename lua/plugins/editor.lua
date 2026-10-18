@@ -388,4 +388,40 @@ return {
       end
     end,
   },
+
+  {
+    -- let me set file explorer size
+    "folke/snacks.nvim",
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          explorer = {
+            layout = {
+              layout = {
+                width = function()
+                  return vim.g.explorer_width or 40
+                end,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "saghen/blink.cmp",
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        providers = {
+          snippets = {
+            enabled = false,
+          },
+        },
+      },
+    },
+  },
 }

@@ -11,6 +11,21 @@ ec_props.switch_case_indent = function() end
 ec_props.space_redirects = function() end
 ec_props.function_next_line = function() end
 
+--- Helper function to parse options to into a parser if available
+---@param self conform.JobFormatterConfig
+---@param ctx conform.Context|conform.RangeContext
+---@return string[]|nil args the arguments for setting a `prettier` parser if they exist in the options, nil otherwise
+local function eval_parser(self, ctx)
+  local ft = vim.bo[ctx.buf].filetype
+  local ext = vim.fn.fnamemodify(ctx.filename, ":e")
+  local options = self.options
+  local parser = options
+    and ((options.ft_parsers and options.ft_parsers[ft]) or (options.ext_parsers and options.ext_parsers[ext]))
+  if parser then
+    return { "--parser", parser }
+  end
+end
+
 return {
 
   -- ensure particular parsers are included by default
@@ -57,6 +72,7 @@ return {
         javascript = { "prettier" },
       },
 
+      ---@type {[string]: conform.JobFormatterConfig | {} }
       formatters = {
         sqlfluff = {
           args = { "format", "-", "--stdin-filename", "$FILENAME" },
@@ -72,8 +88,8 @@ return {
           }),
           require_cwd = false,
           -- only use this formatter when a `.sqlfluff` file is found
-          condition = function(ctx)
-            return vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true })
+          condition = function(_, ctx)
+            return vim.tbl_isempty(vim.fs.find({ ".sqlfluff" }, { path = ctx.filename, upward = true }))
           end,
         },
         ["sqlfluff-ansi"] = {
@@ -128,24 +144,54 @@ return {
           end,
         },
         prettier = {
-          ft_parsers = {
-            javascript = "babel",
-            javascriptreact = "babel",
-            typescript = "typescript",
-            typescriptreact = "typescript",
-            vue = "vue",
-            css = "css",
-            scss = "scss",
-            less = "less",
-            html = "html",
-            json = "json",
-            jsonc = "json",
-            yaml = "yaml",
-            markdown = "markdown",
-            ["markdown.mdx"] = "mdx",
-            graphql = "graphql",
-            handlebars = "glimmer",
+          options = {
+            ft_parsers = {
+              javascript = "babel",
+              javascriptreact = "babel",
+              typescript = "typescript",
+              typescriptreact = "typescript",
+              vue = "vue",
+              css = "css",
+              scss = "scss",
+              less = "less",
+              html = "html",
+              json = "json",
+              jsonc = "json",
+              yaml = "yaml",
+              markdown = "markdown",
+              ["markdown.mdx"] = "mdx",
+              graphql = "graphql",
+              handlebars = "glimmer",
+            },
           },
+        },
+        ["prettier-html"] = {
+          inherit = "prettier",
+          -- args = { "--parser", "html" },
+          -- command = function(self, ctx)
+          --   vim.notify(vim.inspect({ "here's that command stuff", self = self, ctx = ctx }), vim.log.levels.INFO)
+          --   return "prettier"
+          -- end,
+          args = function(self, ctx)
+            vim.notify(vim.inspect({ "here's that args stuff", self = self, ctx = ctx }), vim.log.levels.INFO)
+            return vim.list_extend(
+              eval_parser(self, ctx) or { "--stdin-filepath", "$FILENAME" },
+              { "--parser", "html" }
+            )
+          end,
+          range_args = function(self, ctx)
+            local start_offset, end_offset = require("conform.util").get_offsets_from_range(ctx.buf, ctx.range)
+            local args = eval_parser(self, ctx) or { "--stdin-filepath", "$FILENAME" }
+            return vim.list_extend(
+              args,
+              { "--parser", "html", "--range-start=" .. start_offset, "--range-end=" .. end_offset }
+            )
+          end,
+          -- options = {
+          --   parser = "html",
+          -- },
+          -- cmd = { "prettier", "--parser", "html" },
+          -- condition = nil,
         },
       },
     },
@@ -182,24 +228,35 @@ return {
           },
         },
         lemminx = {
-          mason = false,
+          -- mason = false,
           cmd = { "lemminx", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" },
           settings = {
             xml = {
+              -- trace = {
+              --   server = "verbose",
+              --   client = "verbose",
+              -- },
+              -- logs = {
+              --   client = true,
+              --   file = "/home/thomaswbozeman/lemminx.log",
+              -- },
               format = {
+                -- enabled = false,
                 -- enabled = true,
-                -- splitAttributes = false,
+                -- maxLineWidth = 119,
+                -- gibberish = "gibberish",
+                -- splitAttributes = "gibberish",
                 -- joinCDATALines = false,
                 -- joinCommentLines = false,
-                -- formatComments = true,
+                -- formatComments = false,
                 -- joinContentLines = false,
                 -- spaceBeforeEmptyCloseTag = true,
               },
-              validation = {
-                -- noGrammar = "hint",
-                -- enabled = true,
-                -- schema = true,
-              },
+              -- validation = {
+              --   noGrammar = "hint",
+              --   enabled = true,
+              --   schema = true,
+              -- },
             },
           },
         },
@@ -247,6 +304,26 @@ return {
           vim.keymap.set("i", "'", "'", { buffer = true })
         end,
       })
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-dap",
+    optional = true,
+    opts = function()
+      -- Simple configuration to attach to remote java debug process
+      -- Taken directly from https://github.com/mfussenegger/nvim-dap/wiki/Java
+      local dap = require("dap")
+      dap.configurations.java = {
+        {
+          type = "java",
+          request = "attach",
+          name = "Debug (Attach) - Remote",
+          hostName = "127.0.0.1",
+          -- port = 5005,
+          port = 8787,
+        },
+      }
     end,
   },
 }
