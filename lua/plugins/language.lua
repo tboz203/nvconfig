@@ -53,7 +53,7 @@ return {
         -- sql = { "pg_format", "sqlfluff" },
         -- sql = {},
         sql = { "pg_format" },
-        java = { "google-java-format" },
+        -- java = { "google-java-format" },
         javascript = { "prettier" },
       },
 
@@ -202,9 +202,6 @@ return {
               },
             },
           },
-        },
-        jdtls = {
-          root_markers = { ".git", "mvnw", "gradlew", ".classpath" },
         },
       },
     },
