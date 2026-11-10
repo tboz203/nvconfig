@@ -2,6 +2,7 @@
 --   return {}
 -- end
 
+---@type LazyPluginSpec[]
 return {
   {
     "stevearc/conform.nvim",

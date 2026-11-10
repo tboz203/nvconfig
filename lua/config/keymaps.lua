@@ -16,6 +16,14 @@ vim.keymap.set("n", "<leader>uL", "<cmd>set list!<cr>", { desc = "Toggle list ch
 vim.keymap.set("n", "<c-_>", "gcc", { desc = "Toggle Comment", remap = true })
 vim.keymap.set({ "v", "o" }, "<c-_>", "gc", { desc = "Toggle Comment(s)", remap = true })
 
+-- use Alt-V in place of Ctrl-V
+vim.keymap.set({ "n", "v", "o" }, "<m-v>", "<c-v>", { desc = "Blockwise-visual" })
+
+vim.keymap.set({ "n", "v", "o" }, "<M-Left>", "2zh", { desc = "scroll left 2 cells" })
+vim.keymap.set({ "n", "v", "o" }, "<M-Right>", "2zl", { desc = "scroll right 2 cell" })
+vim.keymap.set({ "n", "v", "o" }, "<M-Up>", "<C-y>", { desc = "scroll up 1 cell" })
+vim.keymap.set({ "n", "v", "o" }, "<M-Down>", "<C-e>", { desc = "scroll down 1 cell" })
+
 -- wk.add({
 --   { "<leader>r", nil, desc = "+refactor/reformat" },
 --   { "<leader>rt", "<cmd>retab!<cr>", desc = "Retab buffer" },

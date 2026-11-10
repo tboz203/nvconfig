@@ -4,15 +4,16 @@
 
 local plugin_root = require("lazy.core.config").options.root
 
+---@type LazyPluginSpec[]
 return {
 
-  "tpope/vim-fugitive",
-  "tpope/vim-repeat",
-  "tpope/vim-sensible",
-  "tpope/vim-sleuth",
-  "tpope/vim-unimpaired",
+  { "tpope/vim-fugitive" },
+  { "tpope/vim-repeat" },
+  { "tpope/vim-sensible" },
+  { "tpope/vim-sleuth" },
+  { "tpope/vim-unimpaired" },
 
-  "s1n7ax/nvim-window-picker",
+  { "s1n7ax/nvim-window-picker" },
 
   { "godlygeek/tabular", cmd = "Tabularize", version = "*" },
 
@@ -24,7 +25,7 @@ return {
   { "nvim-lua/plenary.nvim", lazy = true },
 
   -- handle cli arguments like `filename:lineno`
-  "bogado/file-line",
+  { "bogado/file-line" },
 
   -- { "nvim-mini/mini.nvim", cond = false },
   -- { "nvim-mini/mini.ai", cond = false },

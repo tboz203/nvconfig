@@ -26,6 +26,7 @@ local function eval_parser(self, ctx)
   end
 end
 
+---@type LazyPluginSpec[]
 return {
 
   -- ensure particular parsers are included by default
@@ -229,7 +230,7 @@ return {
         },
         lemminx = {
           -- mason = false,
-          cmd = { "lemminx", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" },
+          -- cmd = { "lemminx", "-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" },
           settings = {
             xml = {
               -- trace = {
